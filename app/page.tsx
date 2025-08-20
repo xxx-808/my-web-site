@@ -1,109 +1,208 @@
 // app/page.tsx
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+
+type Slide = {
+  id: number;
+  title: string;
+  excerpt: string;
+  tag: string;
+  image: string;
+};
+
+const slidesSeed: Slide[] = [
+  {
+    id: 1,
+    title: "Cultural Fluency in Global Literary Pedagogy",
+    excerpt: "Design ELT programs that build cross-cultural communication and critical reading.",
+    tag: "Conference Papers",
+    image: "https://picsum.photos/id/1011/1200/700",
+  },
+  {
+    id: 2,
+    title: "EAP-Enriched Curriculum for Universities",
+    excerpt: "Integrate academic writing, speaking, and research into subject courses.",
+    tag: "Curriculum",
+    image: "https://picsum.photos/id/1005/1200/700",
+  },
+  {
+    id: 3,
+    title: "Assessment for Learning in ELT",
+    excerpt: "Contract grading and formative feedback to empower students.",
+    tag: "Workshops",
+    image: "https://picsum.photos/id/1025/1200/700",
+  },
+];
+
+const rightPosts = [
+  {
+    id: 11,
+    title: "Speaking for Academic Purposes",
+    date: "2025-08-10",
+    image: "https://picsum.photos/id/64/300/200",
+  },
+  {
+    id: 12,
+    title: "The Way of the Fantasist",
+    date: "2024-10-18",
+    image: "https://picsum.photos/id/65/300/200",
+  },
+  {
+    id: 13,
+    title: "Metaphysical Intersections in Language",
+    date: "2024-03-14",
+    image: "https://picsum.photos/id/66/300/200",
+  },
+  {
+    id: 14,
+    title: "Textual Surveillance and Sublime Voices",
+    date: "2023-03-10",
+    image: "https://picsum.photos/id/67/300/200",
+  },
+];
+
+const gridCards = [
+  {
+    id: 21,
+    title: "Contemplating the Future of EMI Assessment",
+    date: "2024-05-31",
+    image: "https://picsum.photos/id/1035/600/400",
+  },
+  {
+    id: 22,
+    title: "EAP-Enriched Curriculum at WKU",
+    date: "2024-05-31",
+    image: "https://picsum.photos/id/1041/600/400",
+  },
+  {
+    id: 23,
+    title: "ESL Curriculum in Sino-American Context",
+    date: "2022-09-10",
+    image: "https://picsum.photos/id/1043/600/400",
+  },
+  {
+    id: 24,
+    title: "Mythopoeic Function of Fantasy",
+    date: "2022-09-10",
+    image: "https://picsum.photos/id/1047/600/400",
+  },
+];
+
 export default function Home() {
+  const [current, setCurrent] = useState(0);
+  const slides = useMemo(() => slidesSeed, []);
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setCurrent((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(id);
+  }, [slides.length]);
+
   return (
     <main className="min-h-screen bg-white text-gray-900">
-      {/* Navbar */}
-      <header className="sticky top-0 z-20 bg-white/80 backdrop-blur border-b">
-        <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-          <a href="#" className="font-bold tracking-tight text-xl">Hengyu Studio</a>
-          <nav className="hidden md:flex gap-6 text-sm">
-            <a className="hover:text-gray-600" href="#services">服务</a>
-            <a className="hover:text-gray-600" href="#work">作品</a>
-            <a className="hover:text-gray-600" href="#about">关于</a>
-            <a className="hover:text-gray-600" href="#contact">联系</a>
-          </nav>
-          <a
-            href="#contact"
-            className="inline-flex items-center rounded-xl border px-3 py-1.5 text-sm font-medium hover:bg-gray-50"
-          >
-            获取报价
-          </a>
+      {/* Top info bar */}
+      <div className="hidden md:block bg-gray-100 text-xs">
+        <div className="mx-auto max-w-6xl px-4 py-2 flex items-center gap-6 overflow-x-auto">
+          <span className="inline-flex items-center rounded-full bg-rose-600 text-white px-2 py-0.5 font-semibold">Research Highlights</span>
+          <a className="shrink-0 hover:text-gray-600" href="#">EAP-Enriched Curriculum</a>
+          <a className="shrink-0 hover:text-gray-600" href="#">Workshops</a>
+          <a className="ml-auto shrink-0 text-gray-600" href="#">{new Date().toLocaleDateString()}</a>
         </div>
+      </div>
+
+      {/* Site title */}
+      <div className="mx-auto max-w-6xl px-4 py-6 text-center">
+        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">Tiffany’s College</h1>
+        <p className="mt-2 text-sm text-gray-600">English Language Teaching • Academic Skills • Curriculum Design</p>
+      </div>
+
+      {/* Navbar */}
+      <header className="sticky top-0 z-20 bg-black text-white">
+        <nav className="mx-auto max-w-6xl px-4">
+          <div className="flex items-center gap-6 text-sm font-medium">
+            <a className="py-3 border-b-2 border-rose-600">HOME</a>
+            <a className="py-3 hover:text-gray-300" href="#about">ABOUT</a>
+            <a className="py-3 hover:text-gray-300" href="#courses">COURSES</a>
+            <a className="py-3 hover:text-gray-300" href="#service">SERVICE</a>
+            <a className="py-3 hover:text-gray-300" href="#blog">BLOG</a>
+            <a className="py-3 hover:text-gray-300" href="#contact">CONTACT</a>
+            <div className="ml-auto flex items-center gap-3 py-2">
+              <input placeholder="Search" className="hidden md:block bg-white/10 placeholder-gray-300 focus:bg-white/20 transition-colors rounded px-3 py-1 text-sm outline-none" />
+              <span className="text-gray-300">🔍</span>
+            </div>
+          </div>
+        </nav>
       </header>
 
-      {/* Hero */}
-      <section className="relative">
-        <div className="mx-auto max-w-6xl px-4 py-20 md:py-28 grid md:grid-cols-2 gap-10 items-center">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight leading-tight">
-              为中小团队打造 <span className="bg-gradient-to-r from-black to-gray-500 bg-clip-text text-transparent">专业、快速、可增长</span> 的网站
-            </h1>
-            <p className="mt-5 text-gray-600">
-              专注 Next.js / Tailwind / Vercel 全栈落地：企业官网、作品集、着陆页、表单与自动化、基础 SEO。
-            </p>
-            <div className="mt-8 flex gap-3">
-              <a
-                href="#contact"
-                className="rounded-xl bg-black text-white px-5 py-3 text-sm font-medium hover:opacity-90"
+      {/* Main hero + sidebar */}
+      <section className="border-b">
+        <div className="mx-auto max-w-6xl px-4 py-8 grid md:grid-cols-3 gap-6">
+          {/* Slider */}
+          <div className="md:col-span-2 relative overflow-hidden rounded-lg">
+            {slides.map((s, idx) => (
+              <article
+                key={s.id}
+                className={`absolute inset-0 transition-opacity duration-700 ${idx === current ? "opacity-100" : "opacity-0"}`}
               >
-                预约咨询
-              </a>
-              <a
-                href="#work"
-                className="rounded-xl border px-5 py-3 text-sm font-medium hover:bg-gray-50"
-              >
-                查看案例
-              </a>
-            </div>
-            <div className="mt-6 text-xs text-gray-500">
-              已服务：个人工作室 / 初创公司 / 课程项目
-            </div>
-          </div>
-          <div className="rounded-2xl border bg-gray-50 p-6">
-            <div className="aspect-video rounded-lg bg-white border grid place-items-center text-sm text-gray-500">
-              放一张你的项目图/Logo（/public/cover.png）
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Services */}
-      <section id="services" className="border-t">
-        <div className="mx-auto max-w-6xl px-4 py-16">
-          <h2 className="text-2xl md:text-3xl font-bold">服务范围</h2>
-          <p className="mt-2 text-gray-600">小规模起步，按需扩展，确保性价比与可维护性。</p>
-
-          <div className="mt-8 grid md:grid-cols-3 gap-6">
-            {[
-              {
-                title: "官网/着陆页",
-                desc: "Next.js + Tailwind + Vercel，一周内上线可迭代。",
-              },
-              {
-                title: "作品集与博客",
-                desc: "MDX 或轻量 CMS（Notion/Sanity），支持基础 SEO。",
-              },
-              {
-                title: "表单与自动化",
-                desc: "联系/预约/邮件通知，接 Formspree/Resend，防垃圾。",
-              },
-            ].map((s) => (
-              <div key={s.title} className="rounded-2xl border p-6 hover:shadow-sm">
-                <h3 className="font-semibold">{s.title}</h3>
-                <p className="mt-2 text-sm text-gray-600">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Work */}
-      <section id="work" className="border-t">
-        <div className="mx-auto max-w-6xl px-4 py-16">
-          <h2 className="text-2xl md:text-3xl font-bold">精选案例</h2>
-          <p className="mt-2 text-gray-600">按“问题 → 方案 → 结果”的结构展示，更能体现价值。</p>
-
-          <div className="mt-8 grid md:grid-cols-3 gap-6">
-            {[1, 2, 3].map((i) => (
-              <article key={i} className="rounded-2xl border overflow-hidden hover:shadow-sm">
-                <div className="aspect-video bg-gray-100 grid place-items-center text-gray-500 text-sm">
-                  项目封面 {i}
+                <div className="relative h-[380px] md:h-[460px] w-full">
+                  <img src={s.image} alt={s.title} className="h-full w-full object-cover" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                  <div className="absolute left-5 right-5 bottom-5 text-white">
+                    <span className="inline-block bg-rose-600 text-xs font-semibold px-2 py-1 rounded">{s.tag}</span>
+                    <h2 className="mt-3 text-2xl md:text-3xl font-extrabold leading-tight">{s.title}</h2>
+                    <p className="mt-2 text-sm md:text-base text-gray-200 max-w-2xl">{s.excerpt}</p>
+                  </div>
                 </div>
-                <div className="p-5">
-                  <h3 className="font-semibold">项目名称 {i}</h3>
-                  <p className="mt-2 text-sm text-gray-600">
-                    问题：一句话痛点。方案：使用 Next.js/优化首屏/简化表单。结果：加载 1.2s，转化+30%。
-                  </p>
+              </article>
+            ))}
+            {/* Slider controls */}
+            <button aria-label="Prev" onClick={() => setCurrent((p) => (p - 1 + slides.length) % slides.length)} className="absolute left-2 top-1/2 -translate-y-1/2 grid place-items-center size-9 rounded-full bg-black/50 text-white">‹</button>
+            <button aria-label="Next" onClick={() => setCurrent((p) => (p + 1) % slides.length)} className="absolute right-2 top-1/2 -translate-y-1/2 grid place-items-center size-9 rounded-full bg-black/50 text-white">›</button>
+            <div className="absolute left-1/2 -translate-x-1/2 bottom-3 flex gap-2">
+              {slides.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setCurrent(i)}
+                  className={`size-2.5 rounded-full ${i === current ? "bg-white" : "bg-white/50"}`}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Sidebar posts */}
+          <aside className="md:col-span-1">
+            <div className="space-y-5">
+              {rightPosts.map((p) => (
+                <a key={p.id} href="#" className="flex gap-3 group">
+                  <img src={p.image} alt="thumb" className="size-24 object-cover rounded" />
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-semibold group-hover:underline line-clamp-2">{p.title}</h3>
+                    <div className="mt-1 text-xs text-gray-500">{new Date(p.date).toLocaleDateString()}</div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      {/* Grid section: Conference Papers */}
+      <section className="">
+        <div className="mx-auto max-w-6xl px-4 py-10">
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-xl md:text-2xl font-extrabold tracking-tight"><span className="border-l-4 border-rose-600 pl-3">CONFERENCE PAPERS</span></h2>
+            <a href="#" className="text-sm text-rose-700 hover:underline">View all</a>
+          </div>
+          <div className="mt-6 grid md:grid-cols-4 gap-6">
+            {gridCards.map((c) => (
+              <article key={c.id} className="rounded-lg border overflow-hidden hover:shadow-sm">
+                <img src={c.image} alt={c.title} className="aspect-[16/10] w-full object-cover" />
+                <div className="p-4">
+                  <div className="text-xs text-gray-500">{new Date(c.date).toLocaleDateString()}</div>
+                  <h3 className="mt-2 font-semibold leading-snug line-clamp-2">{c.title}</h3>
+                  <p className="mt-1 text-sm text-gray-600 line-clamp-2">A short abstract or teaser of the paper to attract clicks.</p>
                 </div>
               </article>
             ))}
@@ -111,88 +210,49 @@ export default function Home() {
         </div>
       </section>
 
-      {/* About */}
-      <section id="about" className="border-t">
-        <div className="mx-auto max-w-6xl px-4 py-16 grid md:grid-cols-2 gap-8">
-          <div>
-            <h2 className="text-2xl md:text-3xl font-bold">关于我</h2>
-            <p className="mt-4 text-gray-600">
-              我是 Hengyu，负责技术与交付。擅长前端工程化与轻后端集成（Next.js、API、部署自动化）。
-              目标是用小而美的方法，帮助你以最低复杂度上线可增长的网站。
-            </p>
-            <ul className="mt-4 text-sm text-gray-600 list-disc pl-5 space-y-1">
-              <li>技术栈：TypeScript / Next.js / Tailwind / Vercel</li>
-              <li>优先事项：性能（Lighthouse≥90）/ SEO / 无障碍</li>
-              <li>可扩展：MDX/CMS、表单自动化、分析 & A/B 测试</li>
-            </ul>
+      {/* Two-column stripe like proposals + desk */}
+      <section className="border-t">
+        <div className="mx-auto max-w-6xl px-4 py-10 grid md:grid-cols-3 gap-8">
+          <div className="md:col-span-2">
+            <h2 className="text-xl md:text-2xl font-extrabold tracking-tight"><span className="border-l-4 border-rose-600 pl-3">RESEARCH PROPOSALS</span></h2>
+            <div className="mt-6 grid md:grid-cols-2 gap-6">
+              {[...gridCards].slice(0, 2).map((c) => (
+                <article key={c.id} className="rounded-lg border overflow-hidden hover:shadow-sm">
+                  <img src={c.image} alt={c.title} className="aspect-[16/10] w-full object-cover" />
+                  <div className="p-4">
+                    <div className="text-xs text-gray-500">{new Date(c.date).toLocaleDateString()}</div>
+                    <h3 className="mt-2 font-semibold leading-snug line-clamp-2">{c.title}</h3>
+                    <p className="mt-1 text-sm text-gray-600 line-clamp-2">Proposal overview and objectives.</p>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
-          <div className="rounded-2xl border p-6 bg-gray-50">
-            <h3 className="font-semibold">合作流程（小规模）</h3>
-            <ol className="mt-3 text-sm text-gray-700 space-y-2 list-decimal pl-5">
-              <li>需求梳理（目标、页面、素材）</li>
-              <li>线框与首页落地</li>
-              <li>部署与域名绑定</li>
-              <li>性能/SEO/A11y 基础优化</li>
-              <li>持续小步迭代（内容/组件/转化）</li>
-            </ol>
-          </div>
-        </div>
-      </section>
 
-      {/* Contact */}
-      <section id="contact" className="border-t">
-        <div className="mx-auto max-w-2xl px-4 py-16">
-          <h2 className="text-2xl md:text-3xl font-bold">联系我</h2>
-          <p className="mt-2 text-gray-600">发需求/预算范围/上线时间，我会尽快回复。</p>
-
-          {/* Formspree 示例：把 action 换成你自己的 endpoint */}
-          <form
-            action="https://formspree.io/f/your-form-id"
-            method="POST"
-            className="mt-6 grid gap-4"
-          >
-            <input
-              type="text"
-              name="name"
-              placeholder="你的名字"
-              required
-              className="w-full rounded-xl border px-4 py-3"
-            />
-            <input
-              type="email"
-              name="email"
-              placeholder="邮箱"
-              required
-              className="w-full rounded-xl border px-4 py-3"
-            />
-            <textarea
-              name="message"
-              placeholder="请简单描述你的需求和时间安排"
-              rows={5}
-              required
-              className="w-full rounded-xl border px-4 py-3"
-            />
-            <button
-              type="submit"
-              className="rounded-xl bg-black text-white px-5 py-3 text-sm font-medium hover:opacity-90"
-            >
-              发送
-            </button>
-          </form>
-
-          <p className="mt-3 text-xs text-gray-500">
-            暂无表单？可直接发邮件：<a className="underline" href="mailto:hz6245179@gmail.com">hz6245179@gmail.com</a>
-          </p>
+          <aside>
+            <h2 className="text-xl md:text-2xl font-extrabold tracking-tight"><span className="border-l-4 border-rose-600 pl-3">FROM TIFFANY’S COLLEGE</span></h2>
+            <div className="mt-4 space-y-4">
+              {rightPosts.map((p) => (
+                <a key={p.id} href="#" className="flex gap-3 group">
+                  <img src={p.image} alt="thumb" className="size-16 object-cover rounded" />
+                  <div className="min-w-0">
+                    <h3 className="text-sm font-semibold group-hover:underline line-clamp-2">{p.title}</h3>
+                    <div className="mt-1 text-xs text-gray-500">{new Date(p.date).toLocaleDateString()}</div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </aside>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t">
-        <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-gray-500 flex items-center justify-between">
-          <span>© {new Date().getFullYear()} Hengyu Studio</span>
+      <footer className="border-t bg-gray-50">
+        <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-gray-600 flex flex-col md:flex-row gap-3 items-center justify-between">
+          <span>© {new Date().getFullYear()} Tiffany's College</span>
           <div className="flex gap-4">
-            <a href="#" className="hover:text-gray-700">隐私政策</a>
-            <a href="#" className="hover:text-gray-700">使用条款</a>
+            <a href="#" className="hover:text-gray-800">Privacy</a>
+            <a href="#" className="hover:text-gray-800">Terms</a>
           </div>
         </div>
       </footer>
