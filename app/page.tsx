@@ -329,7 +329,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t bg-gray-50">
         <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-gray-600 flex flex-col md:flex-row gap-3 items-center justify-between">
-          <span>© {new Date().getFullYear()} Tiffany&apos;s College</span>
+          <span>© {new Date().getFullYear()} {"Tiffany's College"}</span>
           <div className="flex gap-4">
             <a href="#" className="hover:text-gray-800">Privacy</a>
             <a href="#" className="hover:text-gray-800">Terms</a>
