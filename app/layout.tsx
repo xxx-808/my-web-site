@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tiffany’s College | 英语语言教学与课程设计",
-  description: "Tiffany’s College 提供英语语言教学（ELT）、EAP 学术英语、课程设计与教师培训等服务。",
+  title: "Tiffany’s College | 订阅式英语课程",
+  description: "订阅式英语课程、学术英语、考试提升与升学规划，小班制教学与导师精批，支持个人与机构团体订阅。",
 };
 
 export default function RootLayout({

@@ -15,22 +15,22 @@ const slidesSeed: Slide[] = [
   {
     id: 1,
     title: "Cultural Fluency in Global Literary Pedagogy",
-    excerpt: "Design ELT programs that build cross-cultural communication and critical reading.",
-    tag: "Conference Papers",
+    excerpt: "订阅制学术英语课程：每周2次直播 + 作业精批 + 术语速记包，培养跨文化阅读与表达能力。",
+    tag: "订阅课程",
     image: "https://picsum.photos/id/1011/1200/700",
   },
   {
     id: 2,
     title: "EAP-Enriched Curriculum for Universities",
-    excerpt: "Integrate academic writing, speaking, and research into subject courses.",
-    tag: "Curriculum",
+    excerpt: "学术英语强化路径：写作模板库、口语演练房、资料检索工作坊，按月订阅随时加入。",
+    tag: "订阅课程",
     image: "https://picsum.photos/id/1005/1200/700",
   },
   {
     id: 3,
     title: "Assessment for Learning in ELT",
-    excerpt: "Contract grading and formative feedback to empower students.",
-    tag: "Workshops",
+    excerpt: "学习评估即学习：阶段测评 + 个性化学习单，形成性反馈驱动持续进步。",
+    tag: "订阅课程",
     image: "https://picsum.photos/id/1025/1200/700",
   },
 ];
@@ -89,6 +89,45 @@ const gridCards = [
   },
 ];
 
+const pricingPlans = [
+  {
+    id: "monthly",
+    name: "月付计划",
+    price: "¥299",
+    period: "/月",
+    highlight: false,
+    features: [
+      "每周2次直播小班课",
+      "作业批改与要点讲义",
+      "课程回放与练习题库",
+    ],
+  },
+  {
+    id: "quarter",
+    name: "季付计划",
+    price: "¥799",
+    period: "/季",
+    highlight: true,
+    features: [
+      "每周3次直播与口语演练房",
+      "导师精批（写作/演讲各2次/月）",
+      "学术术语速记包与检索工作坊",
+    ],
+  },
+  {
+    id: "term",
+    name: "学期计划（16周）",
+    price: "¥999",
+    period: "/学期",
+    highlight: false,
+    features: [
+      "听说读写与学术规范",
+      "阶段测评与个性化学习单",
+      "升学/考试规划与学情报告",
+    ],
+  },
+];
+
 export default function Home() {
   const [current, setCurrent] = useState(0);
   const slides = useMemo(() => slidesSeed, []);
@@ -115,7 +154,7 @@ export default function Home() {
       {/* Site title */}
       <div className="mx-auto max-w-6xl px-4 py-6 text-center">
         <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">Tiffany’s College</h1>
-        <p className="mt-2 text-sm text-gray-600">English Language Teaching • Academic Skills • Curriculum Design</p>
+        <p className="mt-2 text-sm text-gray-600">订阅式英语课程｜学术英语｜考试与升学路径｜小班制与导师精批</p>
       </div>
 
       {/* Navbar */}
@@ -126,6 +165,7 @@ export default function Home() {
             <a className="py-3 hover:text-gray-300" href="#about">ABOUT</a>
             <a className="py-3 hover:text-gray-300" href="#courses">COURSES</a>
             <a className="py-3 hover:text-gray-300" href="#service">SERVICE</a>
+            <a className="py-3 hover:text-gray-300" href="#pricing">PRICING</a>
             <a className="py-3 hover:text-gray-300" href="#blog">BLOG</a>
             <a className="py-3 hover:text-gray-300" href="#contact">CONTACT</a>
             <div className="ml-auto flex items-center gap-3 py-2">
@@ -202,7 +242,7 @@ export default function Home() {
                 <div className="p-4">
                   <div className="text-xs text-gray-500">{new Date(c.date).toLocaleDateString()}</div>
                   <h3 className="mt-2 font-semibold leading-snug line-clamp-2">{c.title}</h3>
-                  <p className="mt-1 text-sm text-gray-600 line-clamp-2">A short abstract or teaser of the paper to attract clicks.</p>
+                  <p className="mt-1 text-sm text-gray-600 line-clamp-2">订阅后解锁：每周主题课程视频、要点讲义、练习题与参考答案，附学习清单与进度追踪。</p>
                 </div>
               </article>
             ))}
@@ -222,7 +262,7 @@ export default function Home() {
                   <div className="p-4">
                     <div className="text-xs text-gray-500">{new Date(c.date).toLocaleDateString()}</div>
                     <h3 className="mt-2 font-semibold leading-snug line-clamp-2">{c.title}</h3>
-                    <p className="mt-1 text-sm text-gray-600 line-clamp-2">Proposal overview and objectives.</p>
+                    <p className="mt-1 text-sm text-gray-600 line-clamp-2">面向大学/机构的团体订阅方案：统一课程包 + 学情报告 + 私人教研支持，按人数阶梯计费。</p>
                   </div>
                 </article>
               ))}
@@ -243,6 +283,46 @@ export default function Home() {
               ))}
             </div>
           </aside>
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section id="pricing" className="border-t">
+        <div className="mx-auto max-w-6xl px-4 py-10">
+          <h2 className="text-xl md:text-2xl font-extrabold tracking-tight"><span className="border-l-4 border-rose-600 pl-3">PLANS & PRICING</span></h2>
+          <p className="mt-2 text-gray-600">三种订阅周期，随时升级或续费。所有计划均含回放与作业批改，支持7天可退款试学。</p>
+
+          <div className="mt-8 grid md:grid-cols-3 gap-6">
+            {pricingPlans.map((p) => (
+              <div key={p.id} className={`rounded-lg border overflow-hidden ${p.highlight ? "ring-2 ring-rose-600" : ""}`}>
+                <div className={`p-5 ${p.highlight ? "bg-black text-white" : "bg-gray-50"}`}>
+                  <div className="flex items-baseline justify-between">
+                    <h3 className="text-lg font-semibold">{p.name}</h3>
+                    {p.highlight && <span className="text-xs bg-rose-600 text-white rounded px-2 py-0.5">Most Popular</span>}
+                  </div>
+                  <div className="mt-3"><span className="text-3xl font-extrabold">{p.price}</span><span className="ml-1 text-sm opacity-80">{p.period}</span></div>
+                </div>
+                <ul className="p-5 space-y-2 text-sm">
+                  {p.features.map((f) => (
+                    <li key={f} className="flex items-start gap-2">
+                      <span className="mt-0.5 text-rose-600">✓</span>
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="px-5 pb-5">
+                  <button
+                    onClick={() => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                    className={`w-full rounded-md px-4 py-2 text-sm font-medium ${p.highlight ? "bg-black text-white hover:opacity-90" : "border hover:bg-gray-50"}`}
+                  >
+                    立即订阅 / 咨询与开通
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="mt-6 text-xs text-gray-500">结算占位：点击按钮将滚动到“联系”表单，可接入支付后端（如 Stripe/支付宝服务商）替换为安全结算链接。</p>
         </div>
       </section>
 
