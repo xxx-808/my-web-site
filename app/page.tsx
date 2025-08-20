@@ -153,7 +153,7 @@ export default function Home() {
 
       {/* Site title */}
       <div className="mx-auto max-w-6xl px-4 py-6 text-center">
-        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">Tiffany’s College</h1>
+        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">Tiffany&rsquo;s College</h1>
         <p className="mt-2 text-sm text-gray-600">订阅式英语课程｜学术英语｜考试与升学路径｜小班制与导师精批</p>
       </div>
 
@@ -270,7 +270,7 @@ export default function Home() {
           </div>
 
           <aside>
-            <h2 className="text-xl md:text-2xl font-extrabold tracking-tight"><span className="border-l-4 border-rose-600 pl-3">FROM TIFFANY’S COLLEGE</span></h2>
+            <h2 className="text-xl md:text-2xl font-extrabold tracking-tight"><span className="border-l-4 border-rose-600 pl-3">FROM TIFFANY&rsquo;S COLLEGE</span></h2>
             <div className="mt-4 space-y-4">
               {rightPosts.map((p) => (
                 <a key={p.id} href="#" className="flex gap-3 group">
@@ -329,7 +329,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t bg-gray-50">
         <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-gray-600 flex flex-col md:flex-row gap-3 items-center justify-between">
-          <span>© {new Date().getFullYear()} Tiffany's College</span>
+          <span>© {new Date().getFullYear()} Tiffany&apos;s College</span>
           <div className="flex gap-4">
             <a href="#" className="hover:text-gray-800">Privacy</a>
             <a href="#" className="hover:text-gray-800">Terms</a>

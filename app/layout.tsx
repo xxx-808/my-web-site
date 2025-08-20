@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Tiffany’s College | 订阅式英语课程",
+  title: "Tiffany&rsquo;s College | 订阅式英语课程",
   description: "订阅式英语课程、学术英语、考试提升与升学规划，小班制教学与导师精批，支持个人与机构团体订阅。",
 };
 
