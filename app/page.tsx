@@ -312,7 +312,7 @@ export default function Home() {
                 </ul>
                 <div className="px-5 pb-5">
                   <button
-                    onClick={() => document.querySelector('#contact')?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                    onClick={() => document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth", block: "start" })}
                     className={`w-full rounded-md px-4 py-2 text-sm font-medium ${p.highlight ? "bg-black text-white hover:opacity-90" : "border hover:bg-gray-50"}`}
                   >
                     立即订阅 / 咨询与开通
@@ -329,7 +329,7 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t bg-gray-50">
         <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-gray-600 flex flex-col md:flex-row gap-3 items-center justify-between">
-          <span>© {new Date().getFullYear()} {"Tiffany's College"}</span>
+          <span>© {new Date().getFullYear()} Tiffany&rsquo;s College</span>
           <div className="flex gap-4">
             <a href="#" className="hover:text-gray-800">Privacy</a>
             <a href="#" className="hover:text-gray-800">Terms</a>
