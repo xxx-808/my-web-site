@@ -1,36 +1,199 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Tiffany's College 雅思录课视频系统
 
-## Getting Started
+## 项目概述
 
-First, run the development server:
+这是一个专为英语语言教学设计的视频播放系统，支持IP地址绑定、权限控制、防录屏下载等功能。系统采用 Next.js 15 + TypeScript + Tailwind CSS 构建。
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 核心功能
+
+### 🎥 视频播放
+- 支持 MP4 格式视频流式播放
+- 自适应视频播放器
+- 播放进度追踪
+- 防录屏水印覆盖
+
+### 🔒 权限控制
+- **IP地址绑定**: 每个用户绑定唯一IP地址
+- **时间限制**: 可设置访问权限到期时间
+- **分级权限**: 基础用户、高级用户、管理员
+- **视频权限**: 可单独控制每个视频的访问权限
+
+### 🛡️ 安全防护
+- 禁止视频下载
+- 禁止屏幕录制
+- 禁用右键菜单
+- 禁用快捷键操作
+- 防嵌入框架
+
+### 👨‍💼 管理后台
+- 用户管理（添加、删除、权限设置）
+- 视频权限管理
+- 访问统计
+- IP地址白名单管理
+
+## 页面结构
+
+```
+/
+├── /                    # 首页（课程介绍、订阅计划）
+├── /videos             # 视频播放页面
+├── /admin              # 管理后台
+└── /api/video/[id]     # 视频API接口
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 技术架构
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 前端
+- **Next.js 15**: React 框架，支持 App Router
+- **TypeScript**: 类型安全
+- **Tailwind CSS**: 样式框架
+- **React Hooks**: 状态管理
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 后端
+- **Next.js API Routes**: 服务端API
+- **IP地址验证**: 基于请求头的IP检测
+- **权限验证**: 多层权限检查
+- **视频流处理**: 支持Range请求
 
-## Learn More
+### 安全特性
+- **CORS 配置**: 跨域请求控制
+- **HTTP 安全头**: XSS、CSRF 防护
+- **内容类型验证**: 防止MIME类型攻击
 
-To learn more about Next.js, take a look at the following resources:
+## 安装与部署
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 本地开发
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# 克隆项目
+git clone <repository-url>
+cd my-web-site
 
-## Deploy on Vercel
+# 安装依赖
+npm install
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# 启动开发服务器
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 生产部署
+
+```bash
+# 构建项目
+npm run build
+
+# 启动生产服务器
+npm start
+```
+
+## 配置说明
+
+### 1. 视频文件配置
+
+在 `app/api/video/[id]/route.ts` 中配置视频信息：
+
+```typescript
+const videoDatabase = {
+  'video-id': {
+    title: '视频标题',
+    filePath: '/videos/video-file.mp4', // 实际视频文件路径
+    accessControl: {
+      allowedIPs: ['192.168.1.100'], // 允许的IP地址
+      expiresAt: '2025-12-31T23:59:59Z', // 权限到期时间
+      allowDownload: false, // 是否允许下载
+      allowScreenRecord: false, // 是否允许录屏
+    }
+  }
+};
+```
+
+### 2. 用户权限配置
+
+在管理后台可以动态添加用户和设置权限：
+
+- **基础用户**: 只能访问指定视频
+- **高级用户**: 可访问更多视频内容
+- **管理员**: 完全访问权限
+
+### 3. IP地址管理
+
+系统自动检测用户IP地址，支持以下方式：
+
+- `x-forwarded-for`: 代理服务器转发的真实IP
+- `x-real-ip`: 真实IP地址
+- 本地开发默认使用 `127.0.0.1`
+
+## 使用流程
+
+### 学生用户
+1. 访问 `/videos` 页面
+2. 系统自动检测IP地址
+3. 验证访问权限
+4. 选择课程视频开始学习
+
+### 管理员
+1. 访问 `/admin` 页面
+2. 在"用户管理"中添加新用户
+3. 设置IP地址和访问权限
+4. 在"视频权限"中配置视频访问控制
+
+## 安全注意事项
+
+### 1. IP地址验证
+- 确保在生产环境中正确配置代理服务器
+- 定期更新IP地址白名单
+- 监控异常访问行为
+
+### 2. 视频文件安全
+- 将视频文件存储在安全的目录中
+- 定期检查文件访问日志
+- 考虑使用CDN服务提升性能
+
+### 3. 权限管理
+- 定期审查用户权限
+- 及时删除过期用户
+- 记录所有权限变更操作
+
+## 扩展功能
+
+### 1. 数据库集成
+- 可集成 PostgreSQL、MySQL 等数据库
+- 支持用户认证和会话管理
+- 实现更复杂的权限控制逻辑
+
+### 2. 视频加密
+- 集成 DRM 数字版权管理
+- 支持 HLS 加密流媒体
+- 实现端到端视频保护
+
+### 3. 监控分析
+- 集成 Google Analytics
+- 实现用户行为分析
+- 支持实时访问统计
+
+## 故障排除
+
+### 常见问题
+
+1. **视频无法播放**
+   - 检查视频文件路径是否正确
+   - 验证用户IP地址是否在白名单中
+   - 确认访问权限是否过期
+
+2. **权限验证失败**
+   - 检查IP地址检测逻辑
+   - 验证权限配置是否正确
+   - 查看服务器错误日志
+
+3. **管理后台无法访问**
+   - 确认用户权限级别
+   - 检查路由配置
+   - 验证身份验证逻辑
+
+## 技术支持
+
+如有技术问题，请联系开发团队或查看项目文档。
+
+## 许可证
+
+本项目仅供 Tiffany's College 内部使用，禁止商业用途。

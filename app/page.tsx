@@ -163,11 +163,13 @@ export default function Home() {
           <div className="flex items-center gap-6 text-sm font-medium">
             <a className="py-3 border-b-2 border-rose-600">HOME</a>
             <a className="py-3 hover:text-gray-300" href="#about">ABOUT</a>
+            <a className="py-3 hover:text-gray-300" href="/videos">VIDEOS</a>
             <a className="py-3 hover:text-gray-300" href="#courses">COURSES</a>
             <a className="py-3 hover:text-gray-300" href="#service">SERVICE</a>
             <a className="py-3 hover:text-gray-300" href="#pricing">PRICING</a>
             <a className="py-3 hover:text-gray-300" href="#blog">BLOG</a>
             <a className="py-3 hover:text-gray-300" href="#contact">CONTACT</a>
+            <a className="py-3 hover:text-gray-300" href="/admin">ADMIN</a>
             <div className="ml-auto flex items-center gap-3 py-2">
               <input placeholder="Search" className="hidden md:block bg-white/10 placeholder-gray-300 focus:bg-white/20 transition-colors rounded px-3 py-1 text-sm outline-none" />
               <span className="text-gray-300">🔍</span>
