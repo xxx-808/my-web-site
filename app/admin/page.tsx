@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 interface UserAccess {
   id: string;
@@ -146,13 +146,7 @@ export default function AdminPage() {
     setVideos(videos.filter(video => video.id !== videoId));
   };
 
-  const updateUserAccess = (userId: string, field: keyof UserAccess, value: any) => {
-    setUsers(users.map(user => 
-      user.id === userId ? { ...user, [field]: value } : user
-    ));
-  };
-
-  const updateVideoAccess = (videoId: string, field: keyof VideoAccess, value: any) => {
+  const updateVideoAccess = (videoId: string, field: keyof VideoAccess, value: string | boolean) => {
     setVideos(videos.map(video => 
       video.id === videoId ? { ...video, [field]: value } : video
     ));
@@ -173,12 +167,12 @@ export default function AdminPage() {
                 <span className="inline-block w-2 h-2 bg-green-500 rounded-full mr-2"></span>
                 管理员模式
               </span>
-              <a
-                href="/"
+              <button
+                onClick={() => window.location.href = "/"}
                 className="text-gray-600 hover:text-gray-900"
               >
                 返回首页
-              </a>
+              </button>
             </div>
           </div>
         </div>
@@ -195,7 +189,7 @@ export default function AdminPage() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as 'users' | 'videos' | 'analytics')}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.id
                     ? 'border-blue-500 text-blue-600'
@@ -417,7 +411,7 @@ export default function AdminPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">访问级别</label>
                 <select
                   value={newUser.accessLevel}
-                  onChange={(e) => setNewUser({...newUser, accessLevel: e.target.value as any})}
+                  onChange={(e) => setNewUser({...newUser, accessLevel: e.target.value as 'basic' | 'premium' | 'admin'})}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="basic">基础用户</option>
