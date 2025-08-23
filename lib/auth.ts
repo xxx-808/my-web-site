@@ -1,11 +1,7 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { PrismaAdapter } from '@next-auth/prisma-adapter'
-import { prisma } from './db'
-import bcrypt from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -18,37 +14,26 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
-          },
-          include: {
-            cognitiveProfile: true,
-            learningStyle: true
+        // 模拟用户验证 - 在实际部署时替换为数据库查询
+        if (credentials.email === 'student@example.com' && credentials.password === 'password123') {
+          return {
+            id: 'student_001',
+            email: 'student@example.com',
+            name: '张同学',
+            role: 'STUDENT'
           }
-        })
-
-        if (!user) {
-          return null
         }
 
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        )
-
-        if (!isPasswordValid) {
-          return null
+        if (credentials.email === 'admin@tiffanyscollege.com' && credentials.password === 'admin123') {
+          return {
+            id: 'admin_001',
+            email: 'admin@tiffanyscollege.com',
+            name: '管理员',
+            role: 'ADMIN'
+          }
         }
 
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role,
-          cognitiveProfile: user.cognitiveProfile,
-          learningStyle: user.learningStyle
-        }
+        return null
       }
     })
   ],
@@ -59,16 +44,12 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.role = user.role
-        token.cognitiveProfile = user.cognitiveProfile
-        token.learningStyle = user.learningStyle
       }
       return token
     },
     async session({ session, token }) {
       if (token) {
         session.user.role = token.role
-        session.user.cognitiveProfile = token.cognitiveProfile
-        session.user.learningStyle = token.learningStyle
       }
       return session
     }
