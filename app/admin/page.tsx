@@ -152,6 +152,14 @@ export default function AdminPage() {
     ));
   };
 
+  const handleTabClick = (tabId: 'users' | 'videos' | 'analytics') => {
+    setActiveTab(tabId);
+  };
+
+  const handleReturnHome = () => {
+    window.location.href = "/";
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -168,7 +176,7 @@ export default function AdminPage() {
                 管理员模式
               </span>
               <button
-                onClick={() => window.location.href = "/"}
+                onClick={handleReturnHome}
                 className="text-gray-600 hover:text-gray-900"
               >
                 返回首页
@@ -189,7 +197,7 @@ export default function AdminPage() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as 'users' | 'videos' | 'analytics')}
+                onClick={() => handleTabClick(tab.id as 'users' | 'videos' | 'analytics')}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.id
                     ? 'border-blue-500 text-blue-600'
