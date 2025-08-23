@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 
 type Slide = {
   id: number;
@@ -131,6 +132,7 @@ const pricingPlans = [
 export default function Home() {
   const [current, setCurrent] = useState(0);
   const slides = useMemo(() => slidesSeed, []);
+  const router = useRouter();
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -173,9 +175,23 @@ export default function Home() {
             <div className="ml-auto flex items-center gap-3 py-2">
               <input placeholder="Search" className="hidden md:block bg-white/10 placeholder-gray-300 focus:bg-white/20 transition-colors rounded px-3 py-1 text-sm outline-none" />
               <span className="text-gray-300">🔍</span>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={() => router.push("/student-login")}
+                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  学生登录
+                </button>
+                <button 
+                  onClick={() => router.push("/admin-login")}
+                  className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                >
+                  管理员登录
+                </button>
+              </div>
             </div>
           </div>
-        </nav>
+          </nav>
       </header>
 
       {/* Main hero + sidebar */}
@@ -196,7 +212,7 @@ export default function Home() {
                     <h2 className="mt-3 text-2xl md:text-3xl font-extrabold leading-tight">{s.title}</h2>
                     <p className="mt-2 text-sm md:text-base text-gray-200 max-w-2xl">{s.excerpt}</p>
                   </div>
-                </div>
+            </div>
               </article>
             ))}
             {/* Slider controls */}
@@ -231,7 +247,7 @@ export default function Home() {
       </section>
 
       {/* IELTS Video Learning Section */}
-      <section className="bg-gradient-to-br from-emerald-600 via-teal-700 to-cyan-800 text-white border-y">
+      <section className="text-white border-y">
         <div className="mx-auto max-w-7xl px-4 py-20">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-6xl font-extrabold mb-6">
@@ -416,7 +432,7 @@ export default function Home() {
           <div className="flex items-baseline justify-between">
             <h2 className="text-xl md:text-2xl font-extrabold tracking-tight"><span className="border-l-4 border-rose-600 pl-3">CONFERENCE PAPERS</span></h2>
             <a href="#" className="text-sm text-rose-700 hover:underline">View all</a>
-          </div>
+                </div>
           <div className="mt-6 grid md:grid-cols-4 gap-6">
             {gridCards.map((c) => (
               <article key={c.id} className="rounded-lg border overflow-hidden hover:shadow-sm">
@@ -463,7 +479,7 @@ export default function Home() {
                   </div>
                 </a>
               ))}
-            </div>
+          </div>
           </aside>
         </div>
       </section>
@@ -493,12 +509,12 @@ export default function Home() {
                   ))}
                 </ul>
                 <div className="px-5 pb-5">
-                  <button
+            <button
                     onClick={() => document.querySelector("#contact")?.scrollIntoView({ behavior: "smooth", block: "start" })}
                     className={`w-full rounded-md px-4 py-2 text-sm font-medium ${p.highlight ? "bg-black text-white hover:opacity-90" : "border hover:bg-gray-50"}`}
-                  >
+            >
                     立即订阅 / 咨询与开通
-                  </button>
+            </button>
                 </div>
               </div>
             ))}
