@@ -95,7 +95,7 @@ export default function StudentLoginPage() {
       } else {
         setError("邮箱或密码错误");
       }
-    } catch (err) {
+    } catch {
       setError("登录失败，请重试");
     } finally {
       setLoading(false);

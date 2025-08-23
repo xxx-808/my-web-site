@@ -253,10 +253,10 @@ export default function Home() {
             <h2 className="text-4xl md:text-6xl font-extrabold mb-6">
               🎯 雅思视频教学中心
             </h2>
-            <p className="text-xl text-emerald-100 max-w-4xl mx-auto leading-relaxed">
-              基于认知语言科学的雅思备考体系，独创"认知诊断-策略指导-能力迁移"三维培养模型
+            <p className="text-xl text-white max-w-4xl mx-auto leading-relaxed">
+              基于认知语言科学的雅思备考体系，独创&ldquo;认知诊断-策略指导-能力迁移&rdquo;三维培养模型
             </p>
-            <p className="text-lg text-emerald-200 mt-4 max-w-3xl mx-auto">
+            <p className="text-lg text-gray-100 mt-4 max-w-3xl mx-auto">
               专为中国学生设计，解决母语负迁移带来的深层认知障碍，培养英语思维能力
             </p>
           </div>
@@ -268,8 +268,8 @@ export default function Home() {
               <div className="flex items-start gap-6">
                 <div className="text-6xl group-hover:scale-110 transition-transform duration-300">✍️</div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3 text-emerald-100">写作技能训练</h3>
-                  <div className="space-y-3 text-emerald-200">
+                  <h3 className="text-2xl font-bold mb-3 text-white">写作技能训练</h3>
+                  <div className="space-y-3 text-gray-100">
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
                       <span>Task 1: 图表描述认知策略</span>
@@ -296,8 +296,8 @@ export default function Home() {
               <div className="flex items-start gap-6">
                 <div className="text-6xl group-hover:scale-110 transition-transform duration-300">🗣️</div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3 text-emerald-100">口语表达提升</h3>
-                  <div className="space-y-3 text-emerald-200">
+                  <h3 className="text-2xl font-bold mb-3 text-white">口语表达提升</h3>
+                  <div className="space-y-3 text-gray-100">
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
                       <span>Part 1: 个人信息流畅表达</span>
@@ -324,8 +324,8 @@ export default function Home() {
               <div className="flex items-start gap-6">
                 <div className="text-6xl group-hover:scale-110 transition-transform duration-300">📖</div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3 text-emerald-100">阅读策略掌握</h3>
-                  <div className="space-y-3 text-emerald-200">
+                  <h3 className="text-2xl font-bold mb-3 text-white">阅读策略掌握</h3>
+                  <div className="space-y-3 text-gray-100">
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
                       <span>Skimming: 快速主旨把握</span>
@@ -352,8 +352,8 @@ export default function Home() {
               <div className="flex items-start gap-6">
                 <div className="text-6xl group-hover:scale-110 transition-transform duration-300">👂</div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3 text-emerald-100">听力技巧培养</h3>
-                  <div className="space-y-3 text-emerald-200">
+                  <h3 className="text-2xl font-bold mb-3 text-white">听力技巧培养</h3>
+                  <div className="space-y-3 text-gray-100">
                     <div className="flex items-center gap-2">
                       <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
                       <span>预测技巧与关键词识别</span>
@@ -381,18 +381,18 @@ export default function Home() {
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                 <div className="text-3xl mb-3">🧠</div>
-                <h4 className="text-lg font-semibold mb-2">认知科学设计</h4>
-                <p className="text-sm text-emerald-200">基于认知语言科学的课程设计，解决深层学习障碍</p>
+                <h4 className="text-lg font-semibold mb-2 text-white">认知科学设计</h4>
+                <p className="text-sm text-gray-100">基于认知语言科学的课程设计，解决深层学习障碍</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                 <div className="text-3xl mb-3">🎯</div>
-                <h4 className="text-lg font-semibold mb-2">个性化学习路径</h4>
-                <p className="text-sm text-emerald-200">VARK学习风格分析，定制专属学习策略</p>
+                <h4 className="text-lg font-semibold mb-2 text-white">个性化学习路径</h4>
+                <p className="text-sm text-gray-100">VARK学习风格分析，定制专属学习策略</p>
               </div>
               <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
                 <div className="text-3xl mb-3">🔒</div>
-                <h4 className="text-lg font-semibold mb-2">企业级安全保护</h4>
-                <p className="text-sm text-emerald-200">IP绑定、防录屏、权限管理，保护知识产权</p>
+                <h4 className="text-lg font-semibold mb-2 text-white">企业级安全保护</h4>
+                <p className="text-sm text-gray-100">IP绑定、防录屏、权限管理，保护知识产权</p>
               </div>
             </div>
             
@@ -404,7 +404,7 @@ export default function Home() {
               <span className="text-3xl">→</span>
             </a>
             
-            <div className="mt-8 flex items-center justify-center gap-8 text-emerald-200">
+            <div className="mt-8 flex items-center justify-center gap-8 text-gray-100">
               <div className="flex items-center gap-2">
                 <span className="w-3 h-3 bg-emerald-300 rounded-full"></span>
                 <span>IP地址绑定</span>

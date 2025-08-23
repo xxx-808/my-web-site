@@ -198,7 +198,7 @@ export default function VideoManagementPage() {
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
+                onClick={() => setActiveTab(tab.id as 'upload' | 'manage' | 'batch')}
                 className={`py-2 px-1 border-b-2 font-medium text-sm ${
                   activeTab === tab.id
                     ? 'border-purple-500 text-purple-600'
@@ -293,7 +293,7 @@ export default function VideoManagementPage() {
                       </label>
                       <select
                         value={newVideo.category}
-                        onChange={(e) => setNewVideo({...newVideo, category: e.target.value as any})}
+                        onChange={(e) => setNewVideo({...newVideo, category: e.target.value as 'writing' | 'speaking' | 'reading' | 'listening'})}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                       >
                         <option value="writing">写作技能</option>
@@ -309,7 +309,7 @@ export default function VideoManagementPage() {
                       </label>
                       <select
                         value={newVideo.accessLevel}
-                        onChange={(e) => setNewVideo({...newVideo, accessLevel: e.target.value as any})}
+                        onChange={(e) => setNewVideo({...newVideo, accessLevel: e.target.value as 'basic' | 'premium'})}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                       >
                         <option value="basic">基础会员</option>
