@@ -230,44 +230,182 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Video Library Section */}
-      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white border-y">
-        <div className="mx-auto max-w-6xl px-4 py-20">
-          <div className="text-center mb-12">
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
-              🎥 雅思录课视频库
+      {/* IELTS Video Learning Section */}
+      <section className="bg-gradient-to-br from-emerald-600 via-teal-700 to-cyan-800 text-white border-y">
+        <div className="mx-auto max-w-7xl px-4 py-20">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-6xl font-extrabold mb-6">
+              🎯 雅思视频教学中心
             </h2>
-            <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
-              专为 Tiffany&rsquo;s College 学员打造的雅思备考视频课程，包含写作、口语、阅读、听力四大模块
+            <p className="text-xl text-emerald-100 max-w-4xl mx-auto leading-relaxed">
+              基于认知语言科学的雅思备考体系，独创"认知诊断-策略指导-能力迁移"三维培养模型
+            </p>
+            <p className="text-lg text-emerald-200 mt-4 max-w-3xl mx-auto">
+              专为中国学生设计，解决母语负迁移带来的深层认知障碍，培养英语思维能力
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {[
-              { icon: "✍️", title: "写作技巧", desc: "Task 1 图表描述 + Task 2 议论文" },
-              { icon: "🗣️", title: "口语训练", desc: "Part 1-3 完整答题策略" },
-              { icon: "📖", title: "阅读方法", desc: "Skimming & Scanning 技巧" },
-              { icon: "👂", title: "听力策略", desc: "预测与定位技巧" },
-            ].map((item, index) => (
-              <div key={index} className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center border border-white/20 hover:bg-white/20 transition-all duration-300">
-                <div className="text-5xl mb-4">{item.icon}</div>
-                <h3 className="text-xl font-bold mb-3">{item.title}</h3>
-                <p className="text-blue-100 text-sm leading-relaxed">{item.desc}</p>
+          {/* Four Skills Grid */}
+          <div className="grid lg:grid-cols-2 gap-8 mb-16">
+            {/* Writing Skills */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group">
+              <div className="flex items-start gap-6">
+                <div className="text-6xl group-hover:scale-110 transition-transform duration-300">✍️</div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold mb-3 text-emerald-100">写作技能训练</h3>
+                  <div className="space-y-3 text-emerald-200">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span>Task 1: 图表描述认知策略</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span>Task 2: 议论文批判性思维构建</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span>母语负迁移分析与纠正</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 inline-flex items-center gap-2 bg-emerald-500/20 px-4 py-2 rounded-full text-sm">
+                    <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                    认知科学导向
+                  </div>
+                </div>
               </div>
-            ))}
+            </div>
+
+            {/* Speaking Skills */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group">
+              <div className="flex items-start gap-6">
+                <div className="text-6xl group-hover:scale-110 transition-transform duration-300">🗣️</div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold mb-3 text-emerald-100">口语表达提升</h3>
+                  <div className="space-y-3 text-emerald-200">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span>Part 1: 个人信息流畅表达</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span>Part 2: 话题展开策略训练</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span>Part 3: 深度讨论与辩论技巧</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 inline-flex items-center gap-2 bg-emerald-500/20 px-4 py-2 rounded-full text-sm">
+                    <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                    策略指导体系
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Reading Skills */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group">
+              <div className="flex items-start gap-6">
+                <div className="text-6xl group-hover:scale-110 transition-transform duration-300">📖</div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold mb-3 text-emerald-100">阅读策略掌握</h3>
+                  <div className="space-y-3 text-emerald-200">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span>Skimming: 快速主旨把握</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span>Scanning: 精准信息定位</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span>深度理解与批判性分析</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 inline-flex items-center gap-2 bg-emerald-500/20 px-4 py-2 rounded-full text-sm">
+                    <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                    能力迁移训练
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Listening Skills */}
+            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group">
+              <div className="flex items-start gap-6">
+                <div className="text-6xl group-hover:scale-110 transition-transform duration-300">👂</div>
+                <div className="flex-1">
+                  <h3 className="text-2xl font-bold mb-3 text-emerald-100">听力技巧培养</h3>
+                  <div className="space-y-3 text-emerald-200">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span>预测技巧与关键词识别</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span>语音语调变化感知</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span>上下文推理与信息整合</span>
+                    </div>
+                  </div>
+                  <div className="mt-4 inline-flex items-center gap-2 bg-emerald-500/20 px-4 py-2 rounded-full text-sm">
+                    <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                    认知诊断应用
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
-          
+
+          {/* Features & CTA */}
           <div className="text-center">
+            <div className="grid md:grid-cols-3 gap-6 mb-8">
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <div className="text-3xl mb-3">🧠</div>
+                <h4 className="text-lg font-semibold mb-2">认知科学设计</h4>
+                <p className="text-sm text-emerald-200">基于认知语言科学的课程设计，解决深层学习障碍</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <div className="text-3xl mb-3">🎯</div>
+                <h4 className="text-lg font-semibold mb-2">个性化学习路径</h4>
+                <p className="text-sm text-emerald-200">VARK学习风格分析，定制专属学习策略</p>
+              </div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+                <div className="text-3xl mb-3">🔒</div>
+                <h4 className="text-lg font-semibold mb-2">企业级安全保护</h4>
+                <p className="text-sm text-emerald-200">IP绑定、防录屏、权限管理，保护知识产权</p>
+              </div>
+            </div>
+            
             <a
               href="/videos"
-              className="inline-flex items-center gap-3 bg-white text-blue-700 px-10 py-5 rounded-xl text-xl font-bold hover:bg-blue-50 transition-all duration-300 shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105"
+              className="inline-flex items-center gap-4 bg-white text-emerald-700 px-12 py-6 rounded-2xl text-2xl font-bold hover:bg-emerald-50 transition-all duration-300 shadow-2xl hover:shadow-emerald-500/25 transform hover:scale-105"
             >
-              🚀 立即进入视频库
-              <span className="text-2xl">→</span>
+              🚀 进入雅思视频教学中心
+              <span className="text-3xl">→</span>
             </a>
-            <p className="text-blue-200 mt-6 text-lg">
-              🔒 IP地址绑定 • 防录屏下载 • 权限到期管理
-            </p>
+            
+            <div className="mt-8 flex items-center justify-center gap-8 text-emerald-200">
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 bg-emerald-300 rounded-full"></span>
+                <span>IP地址绑定</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 bg-emerald-300 rounded-full"></span>
+                <span>防录屏下载</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 bg-emerald-300 rounded-full"></span>
+                <span>权限到期管理</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="w-3 h-3 bg-emerald-300 rounded-full"></span>
+                <span>认知进度追踪</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>

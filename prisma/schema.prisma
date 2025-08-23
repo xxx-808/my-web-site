@@ -1,0 +1,413 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户表 - 支持多角色和权限管理
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  name          String
+  password      String
+  role          UserRole  @default(STUDENT)
+  status        UserStatus @default(ACTIVE)
+  
+  // 认知诊断相关
+  cognitiveProfile CognitiveProfile?
+  learningStyle   LearningStyle?
+  
+  // 学习进度
+  enrollments    Enrollment[]
+  progress       Progress[]
+  assessments    Assessment[]
+  
+  // 访问控制
+  ipAddresses    UserIP[]
+  accessLogs     AccessLog[]
+  
+  // 系统字段
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  lastLoginAt    DateTime?
+  
+  @@map("users")
+}
+
+// 认知诊断档案
+model CognitiveProfile {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // 语言能力评估
+  listeningLevel        Int      @default(1) // 1-9
+  speakingLevel         Int      @default(1)
+  readingLevel          Int      @default(1)
+  writingLevel          Int      @default(1)
+  
+  // 认知特征
+  learningPace          LearningPace @default(MEDIUM)
+  memoryType            MemoryType @default(VISUAL)
+  attentionSpan         AttentionSpan @default(MEDIUM)
+  
+  // 母语负迁移分析
+  l1Interference        String[] // 母语干扰点
+  cognitiveBarriers     String[] // 认知障碍
+  
+  // 个性化建议
+  recommendedStrategies String[] // 推荐学习策略
+  adaptiveContent       String[] // 适应性内容类型
+  
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@map("cognitive_profiles")
+}
+
+// 学习风格
+model LearningStyle {
+  id                    String   @id @default(cuid())
+  userId                String   @unique
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // VARK学习风格
+  visual                Int      @default(0)
+  auditory              Int      @default(0)
+  reading               Int      @default(0)
+  kinesthetic           Int      @default(0)
+  
+  // 认知偏好
+  prefersStructured     Boolean  @default(true)
+  prefersInteractive    Boolean  @default(true)
+  prefersVisual         Boolean  @default(true)
+  prefersAudio          Boolean  @default(false)
+  
+  // 学习环境偏好
+  optimalSessionLength  Int      @default(45) // 分钟
+  preferredTimeOfDay    TimeOfDay @default(MORNING)
+  
+  @@map("learning_styles")
+}
+
+// 课程表
+model Course {
+  id                    String   @id @default(cuid())
+  title                 String
+  description          String
+  category             CourseCategory
+  level                CourseLevel
+  duration             Int       // 分钟
+  price                Decimal   @db.Decimal(10, 2)
+  
+  // 认知科学设计
+  cognitiveObjectives  String[]  // 认知目标
+  learningStrategies   String[]  // 学习策略
+  assessmentMethods    String[]  // 评估方法
+  
+  // 内容结构
+  modules              Module[]
+  enrollments          Enrollment[]
+  
+  // 系统字段
+  isActive             Boolean   @default(true)
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @updatedAt
+  
+  @@map("courses")
+}
+
+// 课程模块
+model Module {
+  id                    String   @id @default(cuid())
+  courseId              String
+  course                Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  title                 String
+  description          String
+  order                Int
+  duration             Int       // 分钟
+  
+  // 认知设计
+  cognitiveFocus        String   // 认知焦点
+  prerequisiteSkills    String[] // 前置技能
+  
+  // 内容
+  videos                Video[]
+  materials             Material[]
+  assessments           Assessment[]
+  
+  @@map("modules")
+}
+
+// 视频内容
+model Video {
+  id                    String   @id @default(cuid())
+  moduleId              String
+  module                Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  
+  title                 String
+  description          String
+  filePath              String
+  duration              Int       // 秒
+  thumbnail             String?
+  
+  // 认知科学设计
+  cognitiveObjectives   String[]  // 认知目标
+  learningStrategies    String[]  // 学习策略
+  difficultyLevel       Int       @default(1) // 1-5
+  
+  // 访问控制
+  accessControl         VideoAccessControl?
+  accessLogs            AccessLog[]
+  
+  // 系统字段
+  isActive              Boolean   @default(true)
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  
+  @@map("videos")
+}
+
+// 视频访问控制
+model VideoAccessControl {
+  id                    String   @id @default(cuid())
+  videoId               String   @unique
+  video                 Video    @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  
+  // 权限设置
+  allowedIPs            String[]
+  allowedUserIds        String[]
+  expiresAt             DateTime?
+  
+  // 安全设置
+  allowDownload         Boolean  @default(false)
+  allowScreenRecord     Boolean  @default(false)
+  watermarkEnabled      Boolean  @default(true)
+  
+  // 认知科学设置
+  adaptivePlayback      Boolean  @default(true)  // 自适应播放
+  cognitivePacing       Boolean  @default(true)  // 认知节奏控制
+  
+  @@map("video_access_control")
+}
+
+// 学习材料
+model Material {
+  id                    String   @id @default(cuid())
+  moduleId              String
+  module                Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  
+  title                 String
+  type                  MaterialType
+  filePath              String
+  description           String?
+  
+  // 认知设计
+  cognitiveLevel        Int       @default(1)
+  learningStyle         String[]  // 适合的学习风格
+  
+  @@map("materials")
+}
+
+// 用户IP地址管理
+model UserIP {
+  id                    String   @id @default(cuid())
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  ipAddress             String
+  location              String?  // 地理位置
+  deviceInfo            String?  // 设备信息
+  isActive              Boolean  @default(true)
+  
+  createdAt             DateTime @default(now())
+  lastUsedAt            DateTime @default(now())
+  
+  @@map("user_ips")
+}
+
+// 访问日志
+model AccessLog {
+  id                    String   @id @default(cuid())
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  videoId               String?
+  video                 Video?   @relation(fields: [videoId], references: [id], onDelete: SetNull)
+  
+  ipAddress             String
+  userAgent             String?
+  accessType            AccessType
+  timestamp             DateTime @default(now())
+  
+  // 认知学习数据
+  watchDuration         Int?     // 观看时长（秒）
+  completionRate        Float?   // 完成率
+  interactionData       Json?    // 交互数据
+  
+  @@map("access_logs")
+}
+
+// 课程报名
+model Enrollment {
+  id                    String   @id @default(cuid())
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  courseId              String
+  course                Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  
+  status                EnrollmentStatus @default(ACTIVE)
+  enrolledAt            DateTime @default(now())
+  expiresAt             DateTime?
+  
+  // 认知学习进度
+  cognitiveProgress      Json?    // 认知进度数据
+  
+  @@map("enrollments")
+}
+
+// 学习进度
+model Progress {
+  id                    String   @id @default(cuid())
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  moduleId              String
+  module                Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  
+  // 进度数据
+  completedVideos       String[] // 已完成的视频ID
+  completedMaterials    String[] // 已完成的材料ID
+  overallProgress       Float    @default(0) // 0-100
+  
+  // 认知学习数据
+  cognitiveScores       Json?    // 认知能力评分
+  learningEfficiency    Float?   // 学习效率
+  
+  lastAccessedAt        DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@map("progress")
+}
+
+// 认知评估
+model Assessment {
+  id                    String   @id @default(cuid())
+  userId                String
+  user                  User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  moduleId              String
+  module                Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  
+  type                  AssessmentType
+  score                 Float
+  maxScore              Float
+  
+  // 认知能力评估
+  cognitiveDimensions   Json     // 各认知维度得分
+  learningStrategies    String[] // 使用的学习策略
+  timeSpent             Int      // 用时（秒）
+  
+  completedAt           DateTime @default(now())
+  
+  @@map("assessments")
+}
+
+// 枚举类型定义
+enum UserRole {
+  STUDENT
+  TEACHER
+  ADMIN
+  RESEARCHER
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+  PENDING
+}
+
+enum LearningPace {
+  SLOW
+  MEDIUM
+  FAST
+  ADAPTIVE
+}
+
+enum MemoryType {
+  VISUAL
+  AUDITORY
+  KINESTHETIC
+  MULTIMODAL
+}
+
+enum AttentionSpan {
+  SHORT
+  MEDIUM
+  LONG
+  VARIABLE
+}
+
+enum TimeOfDay {
+  MORNING
+  AFTERNOON
+  EVENING
+  NIGHT
+}
+
+enum CourseCategory {
+  IELTS_WRITING
+  IELTS_SPEAKING
+  IELTS_READING
+  IELTS_LISTENING
+  ACADEMIC_ENGLISH
+  RESEARCH_METHODS
+  COGNITIVE_STRATEGIES
+}
+
+enum CourseLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum MaterialType {
+  PDF
+  DOCUMENT
+  PRESENTATION
+  WORKSHEET
+  AUDIO
+  INTERACTIVE
+}
+
+enum AccessType {
+  VIDEO_VIEW
+  MATERIAL_DOWNLOAD
+  ASSESSMENT_TAKE
+  COURSE_ACCESS
+}
+
+enum EnrollmentStatus {
+  ACTIVE
+  COMPLETED
+  EXPIRED
+  CANCELLED
+}
+
+enum AssessmentType {
+  PRE_TEST
+  POST_TEST
+  FORMATIVE
+  SUMMATIVE
+  COGNITIVE_DIAGNOSIS
+}
