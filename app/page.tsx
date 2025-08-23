@@ -231,28 +231,28 @@ export default function Home() {
       </section>
 
       {/* Video Library Section */}
-      <section className="bg-gradient-to-r from-blue-50 to-indigo-50 border-y">
-        <div className="mx-auto max-w-6xl px-4 py-16">
+      <section className="bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 text-white border-y">
+        <div className="mx-auto max-w-6xl px-4 py-20">
           <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900 mb-4">
+            <h2 className="text-4xl md:text-5xl font-extrabold mb-6">
               🎥 雅思录课视频库
             </h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
               专为 Tiffany&rsquo;s College 学员打造的雅思备考视频课程，包含写作、口语、阅读、听力四大模块
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {[
               { icon: "✍️", title: "写作技巧", desc: "Task 1 图表描述 + Task 2 议论文" },
               { icon: "🗣️", title: "口语训练", desc: "Part 1-3 完整答题策略" },
               { icon: "📖", title: "阅读方法", desc: "Skimming & Scanning 技巧" },
               { icon: "👂", title: "听力策略", desc: "预测与定位技巧" },
             ].map((item, index) => (
-              <div key={index} className="bg-white rounded-lg p-6 text-center shadow-sm hover:shadow-md transition-shadow">
-                <div className="text-4xl mb-3">{item.icon}</div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-sm text-gray-600">{item.desc}</p>
+              <div key={index} className="bg-white/10 backdrop-blur-sm rounded-xl p-6 text-center border border-white/20 hover:bg-white/20 transition-all duration-300">
+                <div className="text-5xl mb-4">{item.icon}</div>
+                <h3 className="text-xl font-bold mb-3">{item.title}</h3>
+                <p className="text-blue-100 text-sm leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -260,12 +260,12 @@ export default function Home() {
           <div className="text-center">
             <a
               href="/videos"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors shadow-lg hover:shadow-xl"
+              className="inline-flex items-center gap-3 bg-white text-blue-700 px-10 py-5 rounded-xl text-xl font-bold hover:bg-blue-50 transition-all duration-300 shadow-2xl hover:shadow-blue-500/25 transform hover:scale-105"
             >
               🚀 立即进入视频库
-              <span className="text-xl">→</span>
+              <span className="text-2xl">→</span>
             </a>
-            <p className="text-sm text-gray-500 mt-3">
+            <p className="text-blue-200 mt-6 text-lg">
               🔒 IP地址绑定 • 防录屏下载 • 权限到期管理
             </p>
           </div>
