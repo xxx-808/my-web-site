@@ -18,6 +18,16 @@ interface Video {
   cognitiveObjectives: string[];
 }
 
+// Explicit type for newVideo form state to avoid literal narrowing
+type NewVideo = {
+  title: string;
+  description: string;
+  category: "writing" | "speaking" | "reading" | "listening";
+  accessLevel: "basic" | "premium";
+  tags: string[];
+  cognitiveObjectives: string[];
+};
+
 export default function VideoManagementPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -57,11 +67,11 @@ export default function VideoManagementPage() {
     }
   ]);
 
-  const [newVideo, setNewVideo] = useState({
+  const [newVideo, setNewVideo] = useState<NewVideo>({
     title: "",
     description: "",
-    category: "writing" as const,
-    accessLevel: "basic" as const,
+    category: "writing",
+    accessLevel: "basic",
     tags: [] as string[],
     cognitiveObjectives: [] as string[]
   });
@@ -332,7 +342,7 @@ export default function VideoManagementPage() {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block textsm font-medium text-gray-700 mb-1">
                       认知目标 (用逗号分隔)
                     </label>
                     <input
