@@ -296,17 +296,14 @@ export default function Home() {
               </p>
               <div className="grid sm:grid-cols-3 gap-4">
                 <div className="rounded-xl border p-4">
-                  <div className="text-2xl mb-2">🧭</div>
                   <h4 className="font-semibold mb-1">认知诊断</h4>
                   <p className="text-sm text-gray-600">定位语言瓶颈，识别母语负迁移</p>
                 </div>
                 <div className="rounded-xl border p-4">
-                  <div className="text-2xl mb-2">🎯</div>
                   <h4 className="font-semibold mb-1">策略指导</h4>
                   <p className="text-sm text-gray-600">方法可操作，练习有反馈可追踪</p>
                 </div>
                 <div className="rounded-xl border p-4">
-                  <div className="text-2xl mb-2">🔁</div>
                   <h4 className="font-semibold mb-1">能力迁移</h4>
                   <p className="text-sm text-gray-600">从考试到学术与职场表达的迁移</p>
                 </div>
@@ -341,7 +338,7 @@ export default function Home() {
             {/* Writing Skills */}
             <div className="bg-white rounded-2xl p-8 border hover:bg-gray-50 transition-all duration-300 group">
               <div className="flex items-start gap-6">
-                <div className="text-6xl group-hover:scale-110 transition-transform duration-300">✍️</div>
+                <div className="text-6xl group-hover:scale-110 transition-transform duration-300"></div>
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold mb-3 text-black">写作技能训练</h3>
                   <div className="space-y-3 text-black">
@@ -397,7 +394,7 @@ export default function Home() {
             {/* Reading Skills */}
             <div className="bg-white rounded-2xl p-8 border hover:bg-gray-50 transition-all duration-300 group">
               <div className="flex items-start gap-6">
-                <div className="text-6xl group-hover:scale-110 transition-transform duration-300">📖</div>
+                <div className="text-6xl group-hover:scale-110 transition-transform duration-300"></div>
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold mb-3 text-black">阅读策略掌握</h3>
                   <div className="space-y-3 text-black">
@@ -455,7 +452,7 @@ export default function Home() {
           <div className="text-center text-black">
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               <div className="bg-white rounded-xl p-6 border">
-                <div className="text-3xl mb-3">🧠</div>
+                <div className="text-3xl mb-3"></div>
                 <h4 className="text-lg font-semibold mb-2 text-black">认知科学设计</h4>
                 <p className="text-sm text-black">基于认知语言科学的课程设计，解决深层学习障碍</p>
               </div>
