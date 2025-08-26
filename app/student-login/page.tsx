@@ -7,7 +7,7 @@ interface Student {
   id: string;
   name: string;
   email: string;
-  subscription: string;
+  subscription: "basic" | "pro";
   expiresAt: string;
 }
 
@@ -18,7 +18,7 @@ interface Video {
   duration: string;
   description: string;
   thumbnail: string;
-  accessLevel: "basic" | "premium";
+  accessLevel: "basic" | "pro";
 }
 
 export default function StudentLoginPage() {
@@ -35,21 +35,21 @@ export default function StudentLoginPage() {
     try {
       const raw = localStorage.getItem("tc_auth");
       if (raw) {
-        const parsed = JSON.parse(raw) as { role: "STUDENT" | "ADMIN"; id: string };
+        const parsed = JSON.parse(raw) as { role: "STUDENT" | "ADMIN"; id: string; plan?: "basic" | "pro" };
         if (parsed.role === "STUDENT") {
           setIsLoggedIn(true);
-          setStudent(mockStudent);
+          setStudent({ ...mockStudent, subscription: parsed.plan ?? mockStudent.subscription });
         }
       }
     } catch {}
   }, []);
 
-  // 模拟学生数据
+  // 模拟学生数据（可切换 basic/pro 验证权限）
   const mockStudent: Student = {
     id: "student_001",
     name: "张同学",
     email: "student@example.com",
-    subscription: "premium",
+    subscription: "pro",
     expiresAt: "2025-12-31",
   };
 
@@ -62,7 +62,7 @@ export default function StudentLoginPage() {
       duration: "45:30",
       description: "基于认知科学的图表描述方法，解决中国学生常见表达障碍",
       thumbnail: "https://picsum.photos/id/1011/400/225",
-      accessLevel: "premium",
+      accessLevel: "pro",
     },
     {
       id: "video_002",
@@ -71,7 +71,7 @@ export default function StudentLoginPage() {
       duration: "52:15",
       description: "运用认知语言学理论，培养话题深度展开能力",
       thumbnail: "https://picsum.photos/id/1005/400/225",
-      accessLevel: "premium",
+      accessLevel: "pro",
     },
     {
       id: "video_003",
@@ -105,8 +105,8 @@ export default function StudentLoginPage() {
       if (email === "student@example.com" && password === "password123") {
         setIsLoggedIn(true);
         setStudent(mockStudent);
-        // 记住登录（站内持久）
-        localStorage.setItem("tc_auth", JSON.stringify({ role: "STUDENT", id: mockStudent.id }));
+        // 记住登录（带上账号套餐）
+        localStorage.setItem("tc_auth", JSON.stringify({ role: "STUDENT", id: mockStudent.id, plan: mockStudent.subscription }));
         setError("");
       } else {
         setError("邮箱或密码错误");
@@ -146,7 +146,7 @@ export default function StudentLoginPage() {
     }
   };
 
-  // 分类中文标签（避免自引用导致的隐式 any）
+  // 分类中文标签
   const categoryLabels: Record<Video["category"], string> = {
     writing: "写作技能",
     speaking: "口语表达",
@@ -175,11 +175,11 @@ export default function StudentLoginPage() {
                   <span className="font-medium">{student.name}</span>
                   <span className="mx-2">•</span>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                    student.subscription === "premium" 
+                    student.subscription === "pro" 
                       ? "bg-emerald-100 text-emerald-800" 
                       : "bg-blue-100 text-blue-800"
                   }`}>
-                    {student.subscription === "premium" ? "高级会员" : "基础会员"}
+                    {student.subscription === "pro" ? "Pro 会员" : "普通会员"}
                   </span>
                 </div>
                 <button
@@ -251,11 +251,11 @@ export default function StudentLoginPage() {
                     />
                     <div className="absolute top-2 right-2">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        video.accessLevel === "premium" 
+                        video.accessLevel === "pro" 
                           ? "bg-emerald-100 text-emerald-800" 
                           : "bg-blue-100 text-blue-800"
                       }`}>
-                        {video.accessLevel === "premium" ? "高级" : "基础"}
+                        {video.accessLevel === "pro" ? "Pro" : "Basic"}
                       </span>
                     </div>
                     <div className="absolute bottom-2 left-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
