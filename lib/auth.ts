@@ -21,7 +21,7 @@ export const authOptions: NextAuthOptions = {
             email: 'student@example.com',
             name: '张同学',
             role: 'STUDENT'
-          }
+          } as any
         }
 
         if (credentials.email === 'admin@tiffanyscollege.com' && credentials.password === 'admin123') {
@@ -30,7 +30,7 @@ export const authOptions: NextAuthOptions = {
             email: 'admin@tiffanyscollege.com',
             name: '管理员',
             role: 'ADMIN'
-          }
+          } as any
         }
 
         return null
@@ -42,20 +42,19 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) {
-        token.role = user.role
+      if (user && typeof (user as any).role === 'string') {
+        (token as any).role = (user as any).role
       }
       return token
     },
     async session({ session, token }) {
-      if (token) {
-        session.user.role = token.role
+      if (session?.user && typeof (token as any).role === 'string') {
+        (session.user as any).role = (token as any).role
       }
       return session
     }
   },
   pages: {
-    signIn: '/auth/signin',
-    signUp: '/auth/signup'
+    signIn: '/auth/signin'
   }
 }
