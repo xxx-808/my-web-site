@@ -134,12 +134,33 @@ export default function Home() {
   const slides = useMemo(() => slidesSeed, []);
   const router = useRouter();
 
+  const [authRole, setAuthRole] = useState<"STUDENT" | "ADMIN" | null>(null);
+
   useEffect(() => {
     const id = setInterval(() => {
       setCurrent((prev) => (prev + 1) % slides.length);
     }, 5000);
     return () => clearInterval(id);
   }, [slides.length]);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("tc_auth");
+      if (raw) {
+        const parsed = JSON.parse(raw) as { role: "STUDENT" | "ADMIN"; id: string };
+        setAuthRole(parsed.role);
+      } else {
+        setAuthRole(null);
+      }
+    } catch {
+      setAuthRole(null);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("tc_auth");
+    setAuthRole(null);
+  };
 
   return (
     <main className="min-h-screen bg-white text-black">
@@ -173,21 +194,39 @@ export default function Home() {
             <a className="py-3 hover:text-gray-300" href="#contact">CONTACT</a>
             <a className="py-3 hover:text-gray-300" href="/admin">ADMIN</a>
             <div className="ml-auto flex items-center gap-3 py-2">
+              {authRole && (
+                <span className="hidden md:inline-flex items-center gap-2 bg-white/10 text-white px-2 py-1 rounded">
+                  <span className="inline-block w-2 h-2 rounded-full bg-emerald-400"></span>
+                  已登录：{authRole === "ADMIN" ? "管理员" : "学生"}
+                </span>
+              )}
               <input placeholder="Search" className="hidden md:block bg-white/10 placeholder-gray-300 focus:bg-white/20 transition-colors rounded px-3 py-1 text-sm outline-none" />
               <span className="text-gray-300">🔍</span>
               <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => router.push("/student-login")}
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  学生登录
-                </button>
-                <button 
-                  onClick={() => router.push("/admin-login")}
-                  className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                >
-                  管理员登录
-                </button>
+                {!authRole && (
+                  <>
+                    <button 
+                      onClick={() => router.push("/student-login")}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                    >
+                      学生登录
+                    </button>
+                    <button 
+                      onClick={() => router.push("/admin-login")}
+                      className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                    >
+                      管理员登录
+                    </button>
+                  </>
+                )}
+                {authRole && (
+                  <button
+                    onClick={handleLogout}
+                    className="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-sm font-medium transition-colors"
+                  >
+                    退出登录
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -243,6 +282,42 @@ export default function Home() {
               ))}
             </div>
           </aside>
+        </div>
+      </section>
+
+      {/* Intro Section */}
+      <section className="border-y bg-white text-black">
+        <div className="mx-auto max-w-7xl px-4 py-16">
+          <div className="grid md:grid-cols-3 gap-8 items-center">
+            <div className="md:col-span-2">
+              <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight mb-4">Tiffany’s College · 认知语言科学驱动的英语学习</h2>
+              <p className="text-lg leading-relaxed mb-6">
+                我们以“认知诊断—策略指导—能力迁移”为核心路径，结合 AI 学习分析，为中国学习者构建高效的学术英语训练体系。订阅制课程覆盖 IELTS 听说读写与科研写作，提供直播小班、作业精批与可视化进度跟踪。
+              </p>
+              <div className="grid sm:grid-cols-3 gap-4">
+                <div className="rounded-xl border p-4">
+                  <div className="text-2xl mb-2">🧭</div>
+                  <h4 className="font-semibold mb-1">认知诊断</h4>
+                  <p className="text-sm text-gray-600">定位语言瓶颈，识别母语负迁移</p>
+                </div>
+                <div className="rounded-xl border p-4">
+                  <div className="text-2xl mb-2">🎯</div>
+                  <h4 className="font-semibold mb-1">策略指导</h4>
+                  <p className="text-sm text-gray-600">方法可操作，练习有反馈可追踪</p>
+                </div>
+                <div className="rounded-xl border p-4">
+                  <div className="text-2xl mb-2">🔁</div>
+                  <h4 className="font-semibold mb-1">能力迁移</h4>
+                  <p className="text-sm text-gray-600">从考试到学术与职场表达的迁移</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div className="rounded-2xl border overflow-hidden shadow-sm">
+                <img src="https://picsum.photos/id/1050/800/560" alt="Tiffany’s College" className="w-full h-full object-cover" />
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -344,8 +419,8 @@ export default function Home() {
                     能力迁移训练
                   </div>
                 </div>
-              </div>
-            </div>
+          </div>
+        </div>
 
             {/* Listening Skills */}
             <div className="bg-white rounded-2xl p-8 border hover:bg-gray-50 transition-all duration-300 group">
@@ -427,63 +502,9 @@ export default function Home() {
       </section>
 
       {/* Grid section: Conference Papers */}
-      <section className="text-black">
-        <div className="mx-auto max-w-6xl px-4 py-10">
-          <div className="flex items-baseline justify-between">
-            <h2 className="text-xl md:text-2xl font-extrabold tracking-tight"><span className="border-l-4 border-rose-600 pl-3">CONFERENCE PAPERS</span></h2>
-            <a href="#" className="text-sm text-rose-700 hover:underline">View all</a>
-                </div>
-          <div className="mt-6 grid md:grid-cols-4 gap-6">
-            {gridCards.map((c) => (
-              <article key={c.id} className="rounded-lg border overflow-hidden hover:shadow-sm">
-                <img src={c.image} alt={c.title} className="aspect-[16/10] w-full object-cover" />
-                <div className="p-4">
-                  <div className="text-xs text-black">{new Date(c.date).toLocaleDateString()}</div>
-                  <h3 className="mt-2 font-semibold leading-snug line-clamp-2 text-black">{c.title}</h3>
-                  <p className="mt-1 text-sm text-black line-clamp-2">订阅后解锁：每周主题课程视频、要点讲义、练习题与参考答案，附学习清单与进度追踪。</p>
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
+      
       {/* Two-column stripe like proposals + desk */}
-      <section className="border-t text-black">
-        <div className="mx-auto max-w-6xl px-4 py-10 grid md:grid-cols-3 gap-8">
-          <div className="md:col-span-2">
-            <h2 className="text-xl md:text-2xl font-extrabold tracking-tight"><span className="border-l-4 border-rose-600 pl-3">RESEARCH PROPOSALS</span></h2>
-            <div className="mt-6 grid md:grid-cols-2 gap-6">
-              {[...gridCards].slice(0, 2).map((c) => (
-                <article key={c.id} className="rounded-lg border overflow-hidden hover:shadow-sm">
-                  <img src={c.image} alt={c.title} className="aspect-[16/10] w-full object-cover" />
-                  <div className="p-4">
-                    <div className="text-xs text-black">{new Date(c.date).toLocaleDateString()}</div>
-                    <h3 className="mt-2 font-semibold leading-snug line-clamp-2 text-black">{c.title}</h3>
-                    <p className="mt-1 text-sm text-black line-clamp-2">面向大学/机构的团体订阅方案：统一课程包 + 学情报告 + 私人教研支持，按人数阶梯计费。</p>
-                  </div>
-                </article>
-              ))}
-            </div>
-          </div>
-
-          <aside>
-            <h2 className="text-xl md:text-2xl font-extrabold tracking-tight"><span className="border-l-4 border-rose-600 pl-3">FROM TIFFANY&rsquo;S COLLEGE</span></h2>
-            <div className="mt-4 space-y-4">
-              {rightPosts.map((p) => (
-                <a key={p.id} href="#" className="flex gap-3 group">
-                  <img src={p.image} alt="thumb" className="size-16 object-cover rounded" />
-                  <div className="min-w-0">
-                    <h3 className="text-sm font-semibold group-hover:underline line-clamp-2 text-black">{p.title}</h3>
-                    <div className="mt-1 text-xs text-black">{new Date(p.date).toLocaleDateString()}</div>
-                  </div>
-                </a>
-              ))}
-          </div>
-          </aside>
-        </div>
-      </section>
-
+      
       {/* Pricing */}
       <section id="pricing" className="border-t text-black">
         <div className="mx-auto max-w-6xl px-4 py-10">

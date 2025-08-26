@@ -146,6 +146,14 @@ export default function StudentLoginPage() {
     }
   };
 
+  // 分类中文标签（避免自引用导致的隐式 any）
+  const categoryLabels: Record<Video["category"], string> = {
+    writing: "写作技能",
+    speaking: "口语表达",
+    reading: "阅读策略",
+    listening: "听力技巧",
+  };
+
   if (isLoggedIn && student) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -211,17 +219,12 @@ export default function StudentLoginPage() {
             <div className="grid md:grid-cols-4 gap-6">
               {["writing", "speaking", "reading", "listening"].map((category) => {
                 const categoryVideos = mockVideos.filter(v => v.category === category);
-                const categoryName = {
-                  writing: "写作技能",
-                  speaking: "口语表达",
-                  reading: "阅读策略",
-                  listening: "听力技巧"
-                }[category as keyof typeof categoryName];
+                const label = categoryLabels[category as Video["category"]];
                 
                 return (
                   <div key={category} className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow">
                     <div className="text-4xl mb-3">{getCategoryIcon(category)}</div>
-                    <h4 className="text-lg font-semibold text-gray-900 mb-2">{categoryName}</h4>
+                    <h4 className="text-lg font-semibold text-gray-900 mb-2">{label}</h4>
                     <p className="text-sm text-gray-600 mb-4">
                       {categoryVideos.length} 个视频课程
                     </p>
