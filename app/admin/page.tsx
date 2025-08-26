@@ -23,6 +23,16 @@ interface VideoAccess {
   allowScreenRecord: boolean;
 }
 
+// Define a proper type for creating a new user to avoid literal narrowing
+type NewUser = {
+  name: string;
+  email: string;
+  ipAddress: string;
+  accessLevel: 'basic' | 'premium' | 'admin';
+  accessUntil: string;
+  allowedVideos: string[];
+};
+
 const sampleUsers: UserAccess[] = [
   {
     id: "1",
@@ -82,11 +92,11 @@ export default function AdminPage() {
   const [showAddUser, setShowAddUser] = useState(false);
   const [showAddVideo, setShowAddVideo] = useState(false);
 
-  const [newUser, setNewUser] = useState({
+  const [newUser, setNewUser] = useState<NewUser>({
     name: "",
     email: "",
     ipAddress: "",
-    accessLevel: "basic" as const,
+    accessLevel: "basic",
     accessUntil: "",
     allowedVideos: [] as string[],
   });
