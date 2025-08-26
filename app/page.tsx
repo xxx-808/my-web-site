@@ -142,9 +142,9 @@ export default function Home() {
   }, [slides.length]);
 
   return (
-    <main className="min-h-screen bg-white text-gray-900">
+    <main className="min-h-screen bg-white text-black">
       {/* Top info bar */}
-      <div className="hidden md:block bg-gray-100 text-xs">
+      <div className="hidden md:block bg-gray-100 text-xs text-black">
         <div className="mx-auto max-w-6xl px-4 py-2 flex items-center gap-6 overflow-x-auto">
           <span className="inline-flex items-center rounded-full bg-rose-600 text-white px-2 py-0.5 font-semibold">Research Highlights</span>
           <a className="shrink-0 hover:text-gray-600" href="#">EAP-Enriched Curriculum</a>
@@ -155,8 +155,8 @@ export default function Home() {
 
       {/* Site title */}
       <div className="mx-auto max-w-6xl px-4 py-6 text-center">
-        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-gray-900">Tiffany&rsquo;s College</h1>
-        <p className="mt-2 text-sm text-gray-600">订阅式英语课程｜学术英语｜考试与升学路径｜小班制与导师精批</p>
+        <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-black">Tiffany&rsquo;s College</h1>
+        <p className="mt-2 text-sm text-black">订阅式英语课程｜学术英语｜考试与升学路径｜小班制与导师精批</p>
       </div>
 
       {/* Navbar */}
@@ -195,7 +195,7 @@ export default function Home() {
       </header>
 
       {/* Main hero + sidebar */}
-      <section className="border-b">
+      <section className="border-b text-black">
         <div className="mx-auto max-w-6xl px-4 py-8 grid md:grid-cols-3 gap-6">
           {/* Slider */}
           <div className="md:col-span-2 relative overflow-hidden rounded-lg">
@@ -236,8 +236,8 @@ export default function Home() {
                 <a key={p.id} href="#" className="flex gap-3 group">
                   <img src={p.image} alt="thumb" className="size-24 object-cover rounded" />
                   <div className="min-w-0">
-                    <h3 className="text-sm font-semibold group-hover:underline line-clamp-2">{p.title}</h3>
-                    <div className="mt-1 text-xs text-gray-500">{new Date(p.date).toLocaleDateString()}</div>
+                    <h3 className="text-sm font-semibold group-hover:underline line-clamp-2 text-black">{p.title}</h3>
+                    <div className="mt-1 text-xs text-black">{new Date(p.date).toLocaleDateString()}</div>
                   </div>
                 </a>
               ))}
@@ -247,16 +247,16 @@ export default function Home() {
       </section>
 
       {/* IELTS Video Learning Section */}
-      <section className="text-white border-y">
+      <section className="border-y text-black bg-white">
         <div className="mx-auto max-w-7xl px-4 py-20">
           <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-extrabold mb-6">
+            <h2 className="text-4xl md:text-6xl font-extrabold mb-6 text-black">
               🎯 雅思视频教学中心
             </h2>
-            <p className="text-xl text-white max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl text-black max-w-4xl mx-auto leading-relaxed">
               基于认知语言科学的雅思备考体系，独创&ldquo;认知诊断-策略指导-能力迁移&rdquo;三维培养模型
             </p>
-            <p className="text-lg text-gray-100 mt-4 max-w-3xl mx-auto">
+            <p className="text-lg text-black mt-4 max-w-3xl mx-auto">
               专为中国学生设计，解决母语负迁移带来的深层认知障碍，培养英语思维能力
             </p>
           </div>
@@ -264,27 +264,27 @@ export default function Home() {
           {/* Four Skills Grid */}
           <div className="grid lg:grid-cols-2 gap-8 mb-16">
             {/* Writing Skills */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group">
+            <div className="bg-white rounded-2xl p-8 border hover:bg-gray-50 transition-all duration-300 group">
               <div className="flex items-start gap-6">
                 <div className="text-6xl group-hover:scale-110 transition-transform duration-300">✍️</div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3 text-white">写作技能训练</h3>
-                  <div className="space-y-3 text-gray-100">
+                  <h3 className="text-2xl font-bold mb-3 text-black">写作技能训练</h3>
+                  <div className="space-y-3 text-black">
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                       <span>Task 1: 图表描述认知策略</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                       <span>Task 2: 议论文批判性思维构建</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                       <span>母语负迁移分析与纠正</span>
                     </div>
                   </div>
-                  <div className="mt-4 inline-flex items-center gap-2 bg-emerald-500/20 px-4 py-2 rounded-full text-sm">
-                    <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                  <div className="mt-4 inline-flex items-center gap-2 bg-emerald-100 px-4 py-2 rounded-full text-sm text-black">
+                    <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                     认知科学导向
                   </div>
                 </div>
@@ -292,27 +292,27 @@ export default function Home() {
             </div>
 
             {/* Speaking Skills */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group">
+            <div className="bg-white rounded-2xl p-8 border hover:bg-gray-50 transition-all duration-300 group">
               <div className="flex items-start gap-6">
                 <div className="text-6xl group-hover:scale-110 transition-transform duration-300">🗣️</div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3 text-white">口语表达提升</h3>
-                  <div className="space-y-3 text-gray-100">
+                  <h3 className="text-2xl font-bold mb-3 text-black">口语表达提升</h3>
+                  <div className="space-y-3 text-black">
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                       <span>Part 1: 个人信息流畅表达</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                       <span>Part 2: 话题展开策略训练</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                       <span>Part 3: 深度讨论与辩论技巧</span>
                     </div>
                   </div>
-                  <div className="mt-4 inline-flex items-center gap-2 bg-emerald-500/20 px-4 py-2 rounded-full text-sm">
-                    <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                  <div className="mt-4 inline-flex items-center gap-2 bg-emerald-100 px-4 py-2 rounded-full text-sm text-black">
+                    <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                     策略指导体系
                   </div>
                 </div>
@@ -320,27 +320,27 @@ export default function Home() {
             </div>
 
             {/* Reading Skills */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group">
+            <div className="bg-white rounded-2xl p-8 border hover:bg-gray-50 transition-all duration-300 group">
               <div className="flex items-start gap-6">
                 <div className="text-6xl group-hover:scale-110 transition-transform duration-300">📖</div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3 text-white">阅读策略掌握</h3>
-                  <div className="space-y-3 text-gray-100">
+                  <h3 className="text-2xl font-bold mb-3 text-black">阅读策略掌握</h3>
+                  <div className="space-y-3 text-black">
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                       <span>Skimming: 快速主旨把握</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                       <span>Scanning: 精准信息定位</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                       <span>深度理解与批判性分析</span>
                     </div>
                   </div>
-                  <div className="mt-4 inline-flex items-center gap-2 bg-emerald-500/20 px-4 py-2 rounded-full text-sm">
-                    <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                  <div className="mt-4 inline-flex items-center gap-2 bg-emerald-100 px-4 py-2 rounded-full text-sm text-black">
+                    <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                     能力迁移训练
                   </div>
                 </div>
@@ -348,27 +348,27 @@ export default function Home() {
             </div>
 
             {/* Listening Skills */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20 hover:bg-white/20 transition-all duration-300 group">
+            <div className="bg-white rounded-2xl p-8 border hover:bg-gray-50 transition-all duration-300 group">
               <div className="flex items-start gap-6">
                 <div className="text-6xl group-hover:scale-110 transition-transform duration-300">👂</div>
                 <div className="flex-1">
-                  <h3 className="text-2xl font-bold mb-3 text-white">听力技巧培养</h3>
-                  <div className="space-y-3 text-gray-100">
+                  <h3 className="text-2xl font-bold mb-3 text-black">听力技巧培养</h3>
+                  <div className="space-y-3 text-black">
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                       <span>预测技巧与关键词识别</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                       <span>语音语调变化感知</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                      <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                       <span>上下文推理与信息整合</span>
                     </div>
                   </div>
-                  <div className="mt-4 inline-flex items-center gap-2 bg-emerald-500/20 px-4 py-2 rounded-full text-sm">
-                    <span className="w-2 h-2 bg-emerald-300 rounded-full"></span>
+                  <div className="mt-4 inline-flex items-center gap-2 bg-emerald-100 px-4 py-2 rounded-full text-sm text-black">
+                    <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
                     认知诊断应用
                   </div>
                 </div>
@@ -377,48 +377,48 @@ export default function Home() {
           </div>
 
           {/* Features & CTA */}
-          <div className="text-center">
+          <div className="text-center text-black">
             <div className="grid md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              <div className="bg-white rounded-xl p-6 border">
                 <div className="text-3xl mb-3">🧠</div>
-                <h4 className="text-lg font-semibold mb-2 text-white">认知科学设计</h4>
-                <p className="text-sm text-gray-100">基于认知语言科学的课程设计，解决深层学习障碍</p>
+                <h4 className="text-lg font-semibold mb-2 text-black">认知科学设计</h4>
+                <p className="text-sm text-black">基于认知语言科学的课程设计，解决深层学习障碍</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              <div className="bg-white rounded-xl p-6 border">
                 <div className="text-3xl mb-3">🎯</div>
-                <h4 className="text-lg font-semibold mb-2 text-white">个性化学习路径</h4>
-                <p className="text-sm text-gray-100">VARK学习风格分析，定制专属学习策略</p>
+                <h4 className="text-lg font-semibold mb-2 text-black">个性化学习路径</h4>
+                <p className="text-sm text-black">VARK学习风格分析，定制专属学习策略</p>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6 border border-white/20">
+              <div className="bg-white rounded-xl p-6 border">
                 <div className="text-3xl mb-3">🔒</div>
-                <h4 className="text-lg font-semibold mb-2 text-white">企业级安全保护</h4>
-                <p className="text-sm text-gray-100">IP绑定、防录屏、权限管理，保护知识产权</p>
+                <h4 className="text-lg font-semibold mb-2 text-black">企业级安全保护</h4>
+                <p className="text-sm text-black">IP绑定、防录屏、权限管理，保护知识产权</p>
               </div>
             </div>
             
             <a
               href="/videos"
-              className="inline-flex items-center gap-4 bg-white text-emerald-700 px-12 py-6 rounded-2xl text-2xl font-bold hover:bg-emerald-50 transition-all duration-300 shadow-2xl hover:shadow-emerald-500/25 transform hover:scale-105"
+              className="inline-flex items-center gap-4 bg-gray-100 text-black px-12 py-6 rounded-2xl text-2xl font-bold hover:bg-gray-200 transition-all duration-300 shadow-2xl"
             >
               🚀 进入雅思视频教学中心
               <span className="text-3xl">→</span>
             </a>
             
-            <div className="mt-8 flex items-center justify-center gap-8 text-gray-100">
+            <div className="mt-8 flex items-center justify-center gap-8 text-black">
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-emerald-300 rounded-full"></span>
+                <span className="w-3 h-3 bg-emerald-600 rounded-full"></span>
                 <span>IP地址绑定</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-emerald-300 rounded-full"></span>
+                <span className="w-3 h-3 bg-emerald-600 rounded-full"></span>
                 <span>防录屏下载</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-emerald-300 rounded-full"></span>
+                <span className="w-3 h-3 bg-emerald-600 rounded-full"></span>
                 <span>权限到期管理</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-emerald-300 rounded-full"></span>
+                <span className="w-3 h-3 bg-emerald-600 rounded-full"></span>
                 <span>认知进度追踪</span>
               </div>
             </div>
@@ -427,7 +427,7 @@ export default function Home() {
       </section>
 
       {/* Grid section: Conference Papers */}
-      <section className="">
+      <section className="text-black">
         <div className="mx-auto max-w-6xl px-4 py-10">
           <div className="flex items-baseline justify-between">
             <h2 className="text-xl md:text-2xl font-extrabold tracking-tight"><span className="border-l-4 border-rose-600 pl-3">CONFERENCE PAPERS</span></h2>
@@ -438,9 +438,9 @@ export default function Home() {
               <article key={c.id} className="rounded-lg border overflow-hidden hover:shadow-sm">
                 <img src={c.image} alt={c.title} className="aspect-[16/10] w-full object-cover" />
                 <div className="p-4">
-                  <div className="text-xs text-gray-500">{new Date(c.date).toLocaleDateString()}</div>
-                  <h3 className="mt-2 font-semibold leading-snug line-clamp-2">{c.title}</h3>
-                  <p className="mt-1 text-sm text-gray-600 line-clamp-2">订阅后解锁：每周主题课程视频、要点讲义、练习题与参考答案，附学习清单与进度追踪。</p>
+                  <div className="text-xs text-black">{new Date(c.date).toLocaleDateString()}</div>
+                  <h3 className="mt-2 font-semibold leading-snug line-clamp-2 text-black">{c.title}</h3>
+                  <p className="mt-1 text-sm text-black line-clamp-2">订阅后解锁：每周主题课程视频、要点讲义、练习题与参考答案，附学习清单与进度追踪。</p>
                 </div>
               </article>
             ))}
@@ -449,7 +449,7 @@ export default function Home() {
       </section>
 
       {/* Two-column stripe like proposals + desk */}
-      <section className="border-t">
+      <section className="border-t text-black">
         <div className="mx-auto max-w-6xl px-4 py-10 grid md:grid-cols-3 gap-8">
           <div className="md:col-span-2">
             <h2 className="text-xl md:text-2xl font-extrabold tracking-tight"><span className="border-l-4 border-rose-600 pl-3">RESEARCH PROPOSALS</span></h2>
@@ -458,9 +458,9 @@ export default function Home() {
                 <article key={c.id} className="rounded-lg border overflow-hidden hover:shadow-sm">
                   <img src={c.image} alt={c.title} className="aspect-[16/10] w-full object-cover" />
                   <div className="p-4">
-                    <div className="text-xs text-gray-500">{new Date(c.date).toLocaleDateString()}</div>
-                    <h3 className="mt-2 font-semibold leading-snug line-clamp-2">{c.title}</h3>
-                    <p className="mt-1 text-sm text-gray-600 line-clamp-2">面向大学/机构的团体订阅方案：统一课程包 + 学情报告 + 私人教研支持，按人数阶梯计费。</p>
+                    <div className="text-xs text-black">{new Date(c.date).toLocaleDateString()}</div>
+                    <h3 className="mt-2 font-semibold leading-snug line-clamp-2 text-black">{c.title}</h3>
+                    <p className="mt-1 text-sm text-black line-clamp-2">面向大学/机构的团体订阅方案：统一课程包 + 学情报告 + 私人教研支持，按人数阶梯计费。</p>
                   </div>
                 </article>
               ))}
@@ -474,8 +474,8 @@ export default function Home() {
                 <a key={p.id} href="#" className="flex gap-3 group">
                   <img src={p.image} alt="thumb" className="size-16 object-cover rounded" />
                   <div className="min-w-0">
-                    <h3 className="text-sm font-semibold group-hover:underline line-clamp-2">{p.title}</h3>
-                    <div className="mt-1 text-xs text-gray-500">{new Date(p.date).toLocaleDateString()}</div>
+                    <h3 className="text-sm font-semibold group-hover:underline line-clamp-2 text-black">{p.title}</h3>
+                    <div className="mt-1 text-xs text-black">{new Date(p.date).toLocaleDateString()}</div>
                   </div>
                 </a>
               ))}
@@ -485,15 +485,15 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="border-t">
+      <section id="pricing" className="border-t text-black">
         <div className="mx-auto max-w-6xl px-4 py-10">
           <h2 className="text-xl md:text-2xl font-extrabold tracking-tight"><span className="border-l-4 border-rose-600 pl-3">PLANS & PRICING</span></h2>
-          <p className="mt-2 text-gray-600">三种订阅周期，随时升级或续费。所有计划均含回放与作业批改，支持7天可退款试学。</p>
+          <p className="mt-2 text-black">三种订阅周期，随时升级或续费。所有计划均含回放与作业批改，支持7天可退款试学。</p>
 
           <div className="mt-8 grid md:grid-cols-3 gap-6">
             {pricingPlans.map((p) => (
               <div key={p.id} className={`rounded-lg border overflow-hidden ${p.highlight ? "ring-2 ring-rose-600" : ""}`}>
-                <div className={`p-5 ${p.highlight ? "bg-black text-white" : "bg-gray-50"}`}>
+                <div className={`p-5 ${p.highlight ? "bg-black text-white" : "bg-white"}`}>
                   <div className="flex items-baseline justify-between">
                     <h3 className="text-lg font-semibold">{p.name}</h3>
                     {p.highlight && <span className="text-xs bg-rose-600 text-white rounded px-2 py-0.5">Most Popular</span>}
@@ -520,13 +520,13 @@ export default function Home() {
             ))}
           </div>
 
-          <p className="mt-6 text-xs text-gray-500">结算占位：点击按钮将滚动到“联系”表单，可接入支付后端（如 Stripe/支付宝服务商）替换为安全结算链接。</p>
+          <p className="mt-6 text-xs text-black">结算占位：点击按钮将滚动到“联系”表单，可接入支付后端（如 Stripe/支付宝服务商）替换为安全结算链接。</p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="border-t bg-gray-50">
-        <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-gray-600 flex flex-col md:flex-row gap-3 items-center justify-between">
+      <footer className="border-t bg-white text-black">
+        <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-black flex flex-col md:flex-row gap-3 items-center justify-between">
           <span>© {new Date().getFullYear()} Tiffany&rsquo;s College</span>
           <div className="flex gap-4">
             <a href="#" className="hover:text-gray-800">Privacy</a>

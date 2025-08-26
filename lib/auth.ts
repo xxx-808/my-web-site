@@ -59,7 +59,11 @@ export const authOptions: NextAuthOptions = {
     })
   ],
   session: {
-    strategy: 'jwt'
+    strategy: 'jwt',
+    maxAge: 60 * 60 * 24 * 30 // 30 days
+  },
+  jwt: {
+    maxAge: 60 * 60 * 24 * 30 // 30 days
   },
   callbacks: {
     async jwt({ token, user }: { token: JWT; user?: User }): Promise<AppJWT> {
