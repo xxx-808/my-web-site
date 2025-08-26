@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface Student {
@@ -29,6 +29,20 @@ export default function StudentLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+
+  // 恢复登录状态（本地存储）
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("tc_auth");
+      if (raw) {
+        const parsed = JSON.parse(raw) as { role: "STUDENT" | "ADMIN"; id: string };
+        if (parsed.role === "STUDENT") {
+          setIsLoggedIn(true);
+          setStudent(mockStudent);
+        }
+      }
+    } catch {}
+  }, []);
 
   // 模拟学生数据
   const mockStudent: Student = {
@@ -91,6 +105,8 @@ export default function StudentLoginPage() {
       if (email === "student@example.com" && password === "password123") {
         setIsLoggedIn(true);
         setStudent(mockStudent);
+        // 记住登录（站内持久）
+        localStorage.setItem("tc_auth", JSON.stringify({ role: "STUDENT", id: mockStudent.id }));
         setError("");
       } else {
         setError("邮箱或密码错误");
@@ -107,6 +123,7 @@ export default function StudentLoginPage() {
     setStudent(null);
     setEmail("");
     setPassword("");
+    localStorage.removeItem("tc_auth");
   };
 
   const getCategoryIcon = (category: string) => {
@@ -199,7 +216,7 @@ export default function StudentLoginPage() {
                   speaking: "口语表达",
                   reading: "阅读策略",
                   listening: "听力技巧"
-                }[category];
+                }[category as keyof typeof categoryName];
                 
                 return (
                   <div key={category} className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow">

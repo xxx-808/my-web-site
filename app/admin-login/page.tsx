@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface Admin {
@@ -19,6 +19,20 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
+
+  // 恢复登录状态（本地存储）
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("tc_auth");
+      if (raw) {
+        const parsed = JSON.parse(raw) as { role: "STUDENT" | "ADMIN"; id: string };
+        if (parsed.role === "ADMIN") {
+          setIsLoggedIn(true);
+          setAdmin(mockAdmin);
+        }
+      }
+    } catch {}
+  }, []);
 
   // 模拟管理员数据
   const mockAdmin: Admin = {
@@ -41,6 +55,8 @@ export default function AdminLoginPage() {
       if (email === "admin@tiffanyscollege.com" && password === "admin123") {
         setIsLoggedIn(true);
         setAdmin(mockAdmin);
+        // 记住登录（站内持久）
+        localStorage.setItem("tc_auth", JSON.stringify({ role: "ADMIN", id: mockAdmin.id }));
         setError("");
       } else {
         setError("邮箱或密码错误");
@@ -57,6 +73,7 @@ export default function AdminLoginPage() {
     setAdmin(null);
     setEmail("");
     setPassword("");
+    localStorage.removeItem("tc_auth");
   };
 
   if (isLoggedIn && admin) {
@@ -132,7 +149,7 @@ export default function AdminLoginPage() {
               <div className="text-4xl mb-3">🎥</div>
               <h4 className="text-lg font-semibold text-gray-900 mb-2">视频管理</h4>
               <p className="text-sm text-gray-600 mb-4">上传、编辑和权限控制</p>
-                             <button 
+                           <button 
                  onClick={() => router.push("/admin/video-management")}
                  className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-md text-sm font-medium transition-colors"
                >
