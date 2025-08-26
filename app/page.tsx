@@ -185,7 +185,7 @@ export default function Home() {
         <nav className="mx-auto max-w-6xl px-4">
           <div className="flex items-center gap-6 text-sm font-medium">
             <a className="py-3 border-b-2 border-rose-600">HOME</a>
-            <a className="py-3 hover:text-gray-300" href="#about">ABOUT</a>
+            <a className="py-3 hover:text-gray-300" href="/about">ABOUT</a>
             <a className="py-3 hover:text-gray-300" href="/videos">VIDEOS</a>
             <a className="py-3 hover:text-gray-300" href="#courses">COURSES</a>
             <a className="py-3 hover:text-gray-300" href="#service">SERVICE</a>
