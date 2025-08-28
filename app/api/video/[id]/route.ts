@@ -1,38 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-// 模拟视频数据库
-const videoDatabase = {
-  'ielts-writing-task1': {
-    title: '雅思写作 Task 1 - 图表描述技巧',
-    filePath: '/videos/ielts-writing-task1.mp4', // 实际部署时改为真实视频路径
-    accessControl: {
-      allowedIPs: ['192.168.1.100', '127.0.0.1'], // 允许的IP地址
-      expiresAt: '2025-12-31T23:59:59Z',
-      allowDownload: false,
-      allowScreenRecord: false,
-    }
-  },
-  'ielts-speaking-part2': {
-    title: '雅思口语 Part 2 - 话题展开策略',
-    filePath: '/videos/ielts-speaking-part2.mp4',
-    accessControl: {
-      allowedIPs: ['192.168.1.100', '127.0.0.1'],
-      expiresAt: '2025-12-31T23:59:59Z',
-      allowDownload: false,
-      allowScreenRecord: false,
-    }
-  },
-  'ielts-reading-skills': {
-    title: '雅思阅读 - 快速定位与理解技巧',
-    filePath: '/videos/ielts-reading-skills.mp4',
-    accessControl: {
-      allowedIPs: ['192.168.1.100', '127.0.0.1'],
-      expiresAt: '2025-12-31T23:59:59Z',
-      allowDownload: false,
-      allowScreenRecord: false,
-    }
-  }
-};
+import { prisma } from '@/lib/prisma';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export async function GET(
   request: NextRequest,
@@ -40,10 +9,75 @@ export async function GET(
 ) {
   try {
     const { id } = await context.params;
-    const video = videoDatabase[id as keyof typeof videoDatabase];
+    
+    // 获取用户会话
+    const session = await getServerSession(authOptions);
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ 
+        error: 'Authentication required' 
+      }, { status: 401 });
+    }
+
+    const userId = session.user.id as string;
+
+    // 从数据库查询视频
+    const video = await prisma.video.findUnique({
+      where: { id },
+      include: {
+        category: true,
+        videoAccesses: {
+          where: {
+            userId: userId,
+            isActive: true,
+            OR: [
+              { expiresAt: null },
+              { expiresAt: { gte: new Date() } }
+            ]
+          }
+        }
+      }
+    });
 
     if (!video) {
       return NextResponse.json({ error: 'Video not found' }, { status: 404 });
+    }
+
+    // 检查视频状态
+    if (video.status !== 'ACTIVE') {
+      return NextResponse.json({ 
+        error: 'Video is not available' 
+      }, { status: 403 });
+    }
+
+    // 检查用户是否有访问权限
+    const hasAccess = video.videoAccesses.length > 0;
+    
+    if (!hasAccess) {
+      // 检查用户订阅状态
+      const userSubscription = await prisma.subscription.findFirst({
+        where: {
+          userId: userId,
+          status: 'ACTIVE',
+          endDate: { gte: new Date() }
+        },
+        include: {
+          plan: true
+        }
+      });
+
+      if (!userSubscription) {
+        return NextResponse.json({ 
+          error: 'Subscription required to access this video' 
+        }, { status: 403 });
+      }
+
+      // 检查订阅计划是否满足视频访问级别要求
+      if (video.accessLevel === 'PREMIUM' && userSubscription.plan.name !== 'premium') {
+        return NextResponse.json({ 
+          error: 'Premium subscription required for this video' 
+        }, { status: 403 });
+      }
     }
 
     // 获取客户端IP地址
@@ -51,20 +85,27 @@ export async function GET(
                     request.headers.get('x-real-ip') || 
                     '127.0.0.1';
 
-    // 检查IP权限
-    if (!video.accessControl.allowedIPs.includes(clientIP)) {
-      return NextResponse.json({ 
-        error: 'Access denied. IP not authorized.' 
-      }, { status: 403 });
-    }
-
-    // 检查访问权限是否过期
-    const now = new Date();
-    const expiresAt = new Date(video.accessControl.expiresAt);
-    if (now > expiresAt) {
-      return NextResponse.json({ 
-        error: 'Access expired' 
-      }, { status: 403 });
+    // 记录观看历史
+    try {
+      await prisma.watchHistory.upsert({
+        where: {
+          userId_videoId: {
+            userId: userId,
+            videoId: video.id
+          }
+        },
+        update: {
+          lastWatched: new Date()
+        },
+        create: {
+          userId: userId,
+          videoId: video.id,
+          watchTime: 0,
+          progress: 0
+        }
+      });
+    } catch (error) {
+      console.error('Failed to update watch history:', error);
     }
 
     // 检查Range请求（支持视频流式播放）

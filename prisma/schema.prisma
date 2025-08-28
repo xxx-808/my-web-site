@@ -1,0 +1,194 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// 用户表
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      UserRole @default(STUDENT)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // 关联关系
+  subscriptions Subscription[]
+  videoAccesses VideoAccess[]
+  watchHistory  WatchHistory[]
+  
+  @@map("users")
+}
+
+// 用户角色枚举
+enum UserRole {
+  STUDENT
+  ADMIN
+}
+
+// 订阅计划表
+model SubscriptionPlan {
+  id          String   @id @default(cuid())
+  name        String   // 计划名称：基础版、专业版等
+  description String   // 计划描述
+  price       Float    // 价格
+  duration    Int      // 持续时间（天）
+  features    String[] // 功能特性列表
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 关联关系
+  subscriptions Subscription[]
+  
+  @@map("subscription_plans")
+}
+
+// 用户订阅表
+model Subscription {
+  id        String   @id @default(cuid())
+  userId    String
+  planId    String
+  startDate DateTime @default(now())
+  endDate   DateTime
+  status    SubscriptionStatus @default(ACTIVE)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // 关联关系
+  user  User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  plan  SubscriptionPlan  @relation(fields: [planId], references: [id])
+  
+  @@map("subscriptions")
+}
+
+// 订阅状态枚举
+enum SubscriptionStatus {
+  ACTIVE
+  EXPIRED
+  CANCELLED
+  SUSPENDED
+}
+
+// 视频分类表
+model VideoCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique // writing, speaking, reading, listening
+  displayName String   // 写作、口语、阅读、听力
+  description String?
+  icon        String?  // 图标
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // 关联关系
+  videos Video[]
+  
+  @@map("video_categories")
+}
+
+// 视频表
+model Video {
+  id                 String   @id @default(cuid())
+  title              String
+  description        String
+  categoryId         String
+  duration           String   // 格式：MM:SS
+  filePath           String   // 视频文件路径
+  thumbnail          String   // 缩略图路径
+  accessLevel        AccessLevel @default(BASIC)
+  status             VideoStatus @default(ACTIVE)
+  tags               String[] // 标签数组
+  cognitiveObjectives String[] // 认知目标数组
+  uploadDate         DateTime @default(now())
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  
+  // 关联关系
+  category      VideoCategory  @relation(fields: [categoryId], references: [id])
+  videoAccesses VideoAccess[]
+  watchHistory  WatchHistory[]
+  
+  @@map("videos")
+}
+
+// 访问级别枚举
+enum AccessLevel {
+  BASIC    // 基础会员
+  PREMIUM  // 高级会员
+}
+
+// 视频状态枚举
+enum VideoStatus {
+  ACTIVE      // 已激活
+  INACTIVE    // 已停用
+  PROCESSING  // 处理中
+  ARCHIVED    // 已归档
+}
+
+// 视频访问权限表（用户-视频关联）
+model VideoAccess {
+  id        String   @id @default(cuid())
+  userId    String
+  videoId   String
+  accessType AccessType @default(SUBSCRIPTION) // 访问类型
+  grantedAt DateTime @default(now())
+  expiresAt DateTime? // 过期时间，null表示永久有效
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // 关联关系
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, videoId])
+  @@map("video_accesses")
+}
+
+// 访问类型枚举
+enum AccessType {
+  SUBSCRIPTION  // 订阅获得
+  PURCHASE      // 单独购买
+  FREE          // 免费访问
+  ADMIN         // 管理员授权
+}
+
+// 观看历史表
+model WatchHistory {
+  id         String   @id @default(cuid())
+  userId     String
+  videoId    String
+  watchTime  Int      // 观看时长（秒）
+  progress   Float    // 观看进度（0-1）
+  lastWatched DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  // 关联关系
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  video Video @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  
+  @@unique([userId, videoId])
+  @@map("watch_history")
+}
+
+// 系统配置表
+model SystemConfig {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  value       String
+  description String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("system_configs")
+}

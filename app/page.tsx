@@ -187,6 +187,7 @@ export default function Home() {
             <a className="py-3 border-b-2 border-rose-600">HOME</a>
             <a className="py-3 hover:text-gray-300" href="/about">ABOUT</a>
             <a className="py-3 hover:text-gray-300" href="/videos">VIDEOS</a>
+            <a className="py-3 hover:text-gray-300" href="/dashboard">DASHBOARD</a>
             <a className="py-3 hover:text-gray-300" href="#courses">COURSES</a>
             <a className="py-3 hover:text-gray-300" href="#service">SERVICE</a>
             <a className="py-3 hover:text-gray-300" href="#pricing">PRICING</a>

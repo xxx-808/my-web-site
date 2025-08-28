@@ -103,14 +103,35 @@ export default function VideosPage() {
   // 初始化课程
   useEffect(() => {
     if (isLoggedIn) {
-      // 按上传时间倒序
-      const sorted = [...sampleVideos].sort((a, b) => (a.uploadedAt < b.uploadedAt ? 1 : -1));
-      setVideos(sorted);
-      setIsLoading(false);
+      fetchVideos();
     } else {
       setIsLoading(false);
     }
   }, [isLoggedIn]);
+
+  const fetchVideos = async () => {
+    try {
+      setIsLoading(true);
+      const response = await fetch('/api/videos');
+      if (response.ok) {
+        const data = await response.json();
+        setVideos(data.videos);
+        setPlan(data.userSubscription?.planName === 'premium' ? 'pro' : 'basic');
+      } else {
+        console.error('Failed to fetch videos');
+        // 回退到模拟数据
+        const sorted = [...sampleVideos].sort((a, b) => (a.uploadedAt < b.uploadedAt ? 1 : -1));
+        setVideos(sorted);
+      }
+    } catch (error) {
+      console.error('Error fetching videos:', error);
+      // 回退到模拟数据
+      const sorted = [...sampleVideos].sort((a, b) => (a.uploadedAt < b.uploadedAt ? 1 : -1));
+      setVideos(sorted);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const grouped = useMemo(() => {
     const buckets: Record<VideoAccess["category"], VideoAccess[]> = {
