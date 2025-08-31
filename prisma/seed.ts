@@ -62,11 +62,23 @@ async function main() {
   ]
 
   for (const plan of plans) {
-    await prisma.subscriptionPlan.upsert({
-      where: { name: plan.name },
-      update: plan,
-      create: plan
+    // 检查是否已存在相同名称的计划
+    const existingPlan = await prisma.subscriptionPlan.findFirst({
+      where: { name: plan.name }
     })
+    
+    if (existingPlan) {
+      // 如果存在，更新
+      await prisma.subscriptionPlan.update({
+        where: { id: existingPlan.id },
+        data: plan
+      })
+    } else {
+      // 如果不存在，创建
+      await prisma.subscriptionPlan.create({
+        data: plan
+      })
+    }
   }
 
   console.log('✅ 订阅计划创建完成')
@@ -150,17 +162,29 @@ async function main() {
 
     if (category) {
       const { categoryName, ...videoData } = video;
-      await prisma.video.upsert({
-        where: { title: video.title },
-        update: {
-          ...videoData,
-          categoryId: category.id
-        },
-        create: {
-          ...videoData,
-          categoryId: category.id
-        }
+      // 检查是否已存在相同标题的视频
+      const existingVideo = await prisma.video.findFirst({
+        where: { title: video.title }
       })
+      
+      if (existingVideo) {
+        // 如果存在，更新
+        await prisma.video.update({
+          where: { id: existingVideo.id },
+          data: {
+            ...videoData,
+            categoryId: category.id
+          }
+        })
+      } else {
+        // 如果不存在，创建
+        await prisma.video.create({
+          data: {
+            ...videoData,
+            categoryId: category.id
+          }
+        })
+      }
     }
   }
 
@@ -176,22 +200,26 @@ async function main() {
   })
 
   if (student && basicPlan) {
-    await prisma.subscription.upsert({
+    // 检查是否已存在相同的用户-计划组合
+    const existingSubscription = await prisma.subscription.findFirst({
       where: {
-        userId_planId: {
-          userId: student.id,
-          planId: basicPlan.id
-        }
-      },
-      update: {},
-      create: {
         userId: student.id,
-        planId: basicPlan.id,
-        startDate: new Date(),
-        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30天后
-        status: 'ACTIVE'
+        planId: basicPlan.id
       }
     })
+    
+    if (!existingSubscription) {
+      // 如果不存在，创建新订阅
+      await prisma.subscription.create({
+        data: {
+          userId: student.id,
+          planId: basicPlan.id,
+          startDate: new Date(),
+          endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30天后
+          status: 'ACTIVE'
+        }
+      })
+    }
   }
 
   console.log('✅ 用户订阅创建完成')

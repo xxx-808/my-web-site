@@ -39,6 +39,15 @@
 - **修复**: 替换jwt和session回调中的 `any` 类型
 - **改进**: 使用具体的类型联合 `User & { role?: string }` 和 `Session['user'] & { role?: string }`
 
+#### Prisma Seed文件类型错误修复
+- **文件**: `prisma/seed.ts`
+- **问题**: 多个模型使用了不存在的唯一字段进行 `upsert` 操作
+- **修复**: 
+  - `SubscriptionPlan`: 使用 `findFirst` + `update`/`create` 替代 `upsert`
+  - `Video`: 使用 `findFirst` + `update`/`create` 替代 `upsert`
+  - `Subscription`: 使用 `findFirst` + `create` 替代 `upsert`
+- **改进**: 避免使用不存在的唯一字段，确保类型安全
+
 ### 2. 未使用变量警告修复
 
 #### 管理员页面清理

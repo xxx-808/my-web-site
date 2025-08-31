@@ -150,7 +150,7 @@ export default function AdminPage() {
       if (response.ok) {
         alert("用户创建成功");
         setNewUser({ name: "", email: "", role: "STUDENT" });
-        setShowAddUser(false);
+      setShowAddUser(false);
         loadData();
       } else {
         const error = await response.json();
@@ -482,8 +482,8 @@ export default function AdminPage() {
                         video.accessLevel === 'PREMIUM' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
                       }`}>
                         {video.accessLevel === 'PREMIUM' ? '高级' : '基础'}
-                      </span>
-                    </div>
+                          </span>
+                      </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">状态:</span>
                       <span className={`px-2 py-1 rounded text-xs ${
@@ -496,7 +496,7 @@ export default function AdminPage() {
                       <span className="text-gray-500">观看次数:</span>
                       <span>{video.stats.watchCount}</span>
                     </div>
-                  </div>
+                    </div>
 
                   <div className="mt-4 flex gap-2">
                     <button
