@@ -6,21 +6,36 @@ import { authOptions } from '@/lib/auth';
 // 获取所有用户（管理员权限）
 export async function GET(request: NextRequest) {
   try {
+    console.log('🔍 开始获取用户列表...');
+    
     const session = await getServerSession(authOptions);
+    console.log('📋 会话信息:', { 
+      hasSession: !!session, 
+      userId: session?.user?.userId,
+      userRole: session?.user?.role 
+    });
     
     // 验证管理员权限
     if (!session?.user?.userId) {
+      console.log('❌ 未找到用户会话');
       return NextResponse.json({ 
         error: 'Authentication required' 
       }, { status: 401 });
     }
 
     // 检查是否为管理员
+    console.log('🔐 验证管理员权限...');
     const adminUser = await prisma.user.findUnique({
       where: { id: session.user.userId as string }
     });
 
+    console.log('👤 管理员用户信息:', { 
+      found: !!adminUser, 
+      role: adminUser?.role 
+    });
+
     if (!adminUser || adminUser.role !== 'ADMIN') {
+      console.log('❌ 用户不是管理员');
       return NextResponse.json({ 
         error: 'Admin access required' 
       }, { status: 403 });
@@ -51,6 +66,7 @@ export async function GET(request: NextRequest) {
     const skip = (page - 1) * limit;
 
     // 获取用户列表
+    console.log('📊 开始查询用户数据...');
     const [users, totalCount] = await Promise.all([
       prisma.user.findMany({
         where,
@@ -89,6 +105,8 @@ export async function GET(request: NextRequest) {
       }),
       prisma.user.count({ where })
     ]);
+    
+    console.log(`✅ 成功获取 ${users.length} 个用户，总计 ${totalCount} 个`);
 
     // 处理用户数据
     const processedUsers = users.map((user: {
@@ -244,9 +262,31 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Admin create user error:', error);
+    console.error('❌ Admin create user error:', error);
+    
+    // 提供更详细的错误信息
+    let errorMessage = 'Internal server error';
+    let statusCode = 500;
+    
+    if (error instanceof Error) {
+      errorMessage = error.message;
+      
+      // 根据错误类型设置状态码
+      if (error.message.includes('connect')) {
+        statusCode = 503; // Service Unavailable
+        errorMessage = 'Database connection failed';
+      } else if (error.message.includes('timeout')) {
+        statusCode = 408; // Request Timeout
+        errorMessage = 'Database query timeout';
+      } else if (error.message.includes('unique constraint')) {
+        statusCode = 400; // Bad Request
+        errorMessage = 'User with this email already exists';
+      }
+    }
+    
     return NextResponse.json({ 
-      error: 'Internal server error' 
-    }, { status: 500 });
+      error: errorMessage,
+      details: process.env.NODE_ENV === 'development' ? error : undefined
+    }, { status: statusCode });
   }
 }
