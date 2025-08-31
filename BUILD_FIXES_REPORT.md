@@ -58,6 +58,12 @@
   - `Subscription.status`: `'ACTIVE' as const`
 - **改进**: 确保类型安全，避免运行时错误
 
+#### Prisma查询方法错误修复
+- **文件**: `prisma/seed.ts`
+- **问题**: `SubscriptionPlan` 模型没有 `name` 字段作为唯一字段，不能使用 `findUnique`
+- **修复**: 将 `findUnique` 改为 `findFirst` 查询
+- **改进**: 使用正确的查询方法，避免类型错误
+
 ### 2. 未使用变量警告修复
 
 #### 管理员页面清理

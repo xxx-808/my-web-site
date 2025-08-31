@@ -195,7 +195,7 @@ async function main() {
     where: { email: 'student@example.com' }
   })
 
-  const basicPlan = await prisma.subscriptionPlan.findUnique({
+  const basicPlan = await prisma.subscriptionPlan.findFirst({
     where: { name: 'basic' }
   })
 
