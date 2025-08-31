@@ -88,12 +88,12 @@ async function main() {
     {
       email: 'student@example.com',
       name: '张同学',
-      role: 'STUDENT'
+      role: 'STUDENT' as const
     },
     {
       email: 'admin@tiffanyscollege.com',
       name: '管理员',
-      role: 'ADMIN'
+      role: 'ADMIN' as const
     }
   ]
 
