@@ -105,7 +105,13 @@ export async function GET(request: NextRequest) {
         endDate: Date;
         status: string;
       }>;
-      videoAccesses: Array<any>;
+      videoAccesses: Array<{
+        id: string;
+        video: {
+          id: string;
+          title: string;
+        };
+      }>;
       watchHistory: Array<{ lastWatched: Date }>;
     }) => ({
       id: user.id,
