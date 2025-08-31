@@ -7,11 +7,19 @@ async function main() {
 
   // 清空现有数据（除了用户和分类）
   console.log('清理现有数据...')
-  await prisma.videoAccess.deleteMany()
-  await prisma.watchHistory.deleteMany()
-  await prisma.subscription.deleteMany()
-  await prisma.video.deleteMany()
-  console.log('✅ 现有数据清理完成')
+  try {
+    await prisma.videoAccess.deleteMany()
+    await prisma.watchHistory.deleteMany()
+    await prisma.subscription.deleteMany()
+    await prisma.video.deleteMany()
+    await prisma.user.deleteMany()
+    await prisma.subscriptionPlan.deleteMany()
+    await prisma.videoCategory.deleteMany()
+    await prisma.systemConfig.deleteMany()
+    console.log('✅ 现有数据清理完成')
+  } catch (error) {
+    console.log('⚠️ 清理数据时出现错误（可能是首次运行）:', error)
+  }
 
   // 创建视频分类
   const categories = [
@@ -42,10 +50,8 @@ async function main() {
   ]
 
   for (const category of categories) {
-    await prisma.videoCategory.upsert({
-      where: { name: category.name },
-      update: category,
-      create: category
+    await prisma.videoCategory.create({
+      data: category
     })
   }
 
@@ -70,23 +76,9 @@ async function main() {
   ]
 
   for (const plan of plans) {
-    // 检查是否已存在相同名称的计划
-    const existingPlan = await prisma.subscriptionPlan.findFirst({
-      where: { name: plan.name }
+    await prisma.subscriptionPlan.create({
+      data: plan
     })
-    
-    if (existingPlan) {
-      // 如果存在，更新
-      await prisma.subscriptionPlan.update({
-        where: { id: existingPlan.id },
-        data: plan
-      })
-    } else {
-      // 如果不存在，创建
-      await prisma.subscriptionPlan.create({
-        data: plan
-      })
-    }
   }
 
   console.log('✅ 订阅计划创建完成')
@@ -106,10 +98,8 @@ async function main() {
   ]
 
   for (const user of users) {
-    await prisma.user.upsert({
-      where: { email: user.email },
-      update: user,
-      create: user
+    await prisma.user.create({
+      data: user
     })
   }
 
@@ -125,26 +115,15 @@ async function main() {
   })
 
   if (student && basicPlan) {
-    // 检查是否已存在相同的用户-计划组合
-    const existingSubscription = await prisma.subscription.findFirst({
-      where: {
+    await prisma.subscription.create({
+      data: {
         userId: student.id,
-        planId: basicPlan.id
+        planId: basicPlan.id,
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30天后
+        status: 'ACTIVE' as const
       }
     })
-    
-    if (!existingSubscription) {
-      // 如果不存在，创建新订阅
-      await prisma.subscription.create({
-        data: {
-          userId: student.id,
-          planId: basicPlan.id,
-          startDate: new Date(),
-          endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30天后
-          status: 'ACTIVE' as const
-        }
-      })
-    }
   }
 
   console.log('✅ 用户订阅创建完成')
