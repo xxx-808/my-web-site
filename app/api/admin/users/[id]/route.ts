@@ -190,7 +190,7 @@ export async function PUT(
     }
 
     // 更新用户信息
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     if (name) updateData.name = name;
     if (email) updateData.email = email;
     if (role) updateData.role = role.toUpperCase();

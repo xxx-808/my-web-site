@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
     const planId = searchParams.get('planId');
 
     // 构建查询条件
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     
     if (status && status !== 'all') {
       where.status = status.toUpperCase();

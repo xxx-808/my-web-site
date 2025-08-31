@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     const accessLevel = searchParams.get('accessLevel');
 
     // 构建查询条件
-    const where: any = {};
+    const where: Record<string, unknown> = {};
     
     if (search) {
       where.OR = [

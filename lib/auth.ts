@@ -114,7 +114,7 @@ export const authOptions: NextAuthOptions = {
 }
 
 // 密码验证函数（简化版本）
-async function validatePassword(inputPassword: string, user: any): Promise<boolean> {
+async function validatePassword(inputPassword: string, user: { email: string }): Promise<boolean> {
   // 这里应该使用bcrypt进行密码验证
   // 为了演示，我们暂时使用硬编码的密码
   

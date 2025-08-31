@@ -63,32 +63,33 @@ const rightPosts = [
   },
 ];
 
-const gridCards = [
-  {
-    id: 21,
-    title: "Contemplating the Future of EMI Assessment",
-    date: "2024-05-31",
-    image: "https://picsum.photos/id/1035/600/400",
-  },
-  {
-    id: 22,
-    title: "EAP-Enriched Curriculum at WKU",
-    date: "2024-05-31",
-    image: "https://picsum.photos/id/1041/600/400",
-  },
-  {
-    id: 23,
-    title: "ESL Curriculum in Sino-American Context",
-    date: "2022-09-10",
-    image: "https://picsum.photos/id/1043/600/400",
-  },
-  {
-    id: 24,
-    title: "Mythopoeic Function of Fantasy",
-    date: "2022-09-10",
-    image: "https://picsum.photos/id/1047/600/400",
-  },
-];
+// 网格卡片数据（预留用于未来功能）
+// const gridCards = [
+//   {
+//     id: 21,
+//     title: "Contemplating the Future of EMI Assessment",
+//     date: "2024-05-31",
+//     image: "https://picsum.photos/id/1035/600/400",
+//   },
+//   {
+//     id: 22,
+//     title: "EAP-Enriched Curriculum at WKU",
+//     date: "2024-05-31",
+//     image: "https://picsum.photos/id/1041/600/400",
+//   },
+//   {
+//     id: 23,
+//     title: "ESL Curriculum in Sino-American Context",
+//     date: "2022-09-10",
+//     image: "https://picsum.photos/id/1043/600/400",
+//   },
+//   {
+//     id: 24,
+//     title: "Mythopoeic Function of Fantasy",
+//     date: "2022-09-10",
+//     image: "https://picsum.photos/id/1047/600/400",
+//   },
+// ];
 
 const pricingPlans = [
   {

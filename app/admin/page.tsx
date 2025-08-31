@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 interface UserData {
@@ -73,26 +73,19 @@ export default function AdminPage() {
     role: "STUDENT"
   });
 
-  // 视频管理状态
-  const [showAddVideo, setShowAddVideo] = useState(false);
-  const [newVideo, setNewVideo] = useState({
-    title: "",
-    description: "",
-    categoryId: "",
-    accessLevel: "BASIC"
-  });
+  // 移除未使用的视频管理状态（已移到专门的视频管理页面）
 
   useEffect(() => {
     checkAuthentication();
-  }, []);
+  }, [checkAuthentication]);
 
   useEffect(() => {
     if (isAuthenticated) {
       loadData();
     }
-  }, [isAuthenticated, activeTab]);
+  }, [isAuthenticated, activeTab, loadData]);
 
-  const checkAuthentication = () => {
+  const checkAuthentication = useCallback(() => {
     try {
       const raw = localStorage.getItem("tc_auth");
       if (raw) {
@@ -108,9 +101,9 @@ export default function AdminPage() {
     } catch {
       router.push("/admin-login");
     }
-  };
+  }, [router]);
 
-  const loadData = async () => {
+  const loadData = useCallback(async () => {
     setIsLoading(true);
     try {
       if (activeTab === 'analytics') {
@@ -137,7 +130,7 @@ export default function AdminPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [activeTab]);
 
   const handleAddUser = async () => {
     if (!newUser.name || !newUser.email) {

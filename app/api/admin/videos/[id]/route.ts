@@ -200,7 +200,7 @@ export async function PUT(
     }
 
     // 更新视频信息
-    const updateData: any = {};
+    const updateData: Record<string, unknown> = {};
     if (title) updateData.title = title;
     if (description) updateData.description = description;
     if (categoryId) updateData.categoryId = categoryId;

@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const session = await getServerSession(authOptions);
     
@@ -76,11 +76,8 @@ export async function GET(request: NextRequest) {
         by: ['categoryId'],
         _count: {
           id: true
-        },
-        include: {
-          category: true
         }
-      }) as any,
+      }),
       
       // 按计划分组的订阅
       prisma.subscription.groupBy({
@@ -165,7 +162,7 @@ export async function GET(request: NextRequest) {
 
     // 处理视频分类统计
     const videoCategories = await prisma.videoCategory.findMany();
-    const videoByCategoryWithNames = videosByCategory.map((item: any) => {
+    const videoByCategoryWithNames = videosByCategory.map((item) => {
       const category = videoCategories.find(cat => cat.id === item.categoryId);
       return {
         categoryId: item.categoryId,

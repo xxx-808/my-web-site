@@ -42,7 +42,7 @@ export default function DashboardPage() {
     try {
       const raw = localStorage.getItem("tc_auth");
       if (raw) {
-        const parsed = JSON.parse(raw) as { role: string; id: string };
+        JSON.parse(raw) as { role: string; id: string };
         setIsLoggedIn(true);
         fetchUserData();
       } else {

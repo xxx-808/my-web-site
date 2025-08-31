@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 
 interface Video {
@@ -68,7 +68,7 @@ export default function VideoManagementPage() {
 
   useEffect(() => {
     checkAuthentication();
-  }, []);
+  }, [checkAuthentication]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -76,7 +76,7 @@ export default function VideoManagementPage() {
     }
   }, [isAuthenticated]);
 
-  const checkAuthentication = () => {
+  const checkAuthentication = useCallback(() => {
     try {
       const raw = localStorage.getItem("tc_auth");
       if (raw) {
@@ -92,7 +92,7 @@ export default function VideoManagementPage() {
     } catch {
       router.push("/admin-login");
     }
-  };
+  }, [router]);
 
   const loadData = async () => {
     setIsLoading(true);
