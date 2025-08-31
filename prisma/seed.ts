@@ -116,7 +116,7 @@ async function main() {
       duration: '45:30',
       filePath: '/videos/writing-task1.mp4',
       thumbnail: 'https://picsum.photos/id/1011/400/225',
-      accessLevel: 'PREMIUM',
+      accessLevel: 'PREMIUM' as const,
       tags: ['写作', 'Task1', '图表描述', '认知策略'],
       cognitiveObjectives: ['提高图表分析能力', '培养逻辑表达思维', '减少母语负迁移']
     },
@@ -127,7 +127,7 @@ async function main() {
       duration: '52:15',
       filePath: '/videos/speaking-part2.mp4',
       thumbnail: 'https://picsum.photos/id/1005/400/225',
-      accessLevel: 'PREMIUM',
+      accessLevel: 'PREMIUM' as const,
       tags: ['口语', 'Part2', '话题展开', '认知语言学'],
       cognitiveObjectives: ['提升话题延展能力', '培养思维连贯性', '增强表达自信']
     },
@@ -138,7 +138,7 @@ async function main() {
       duration: '48:20',
       filePath: '/videos/reading-skills.mp4',
       thumbnail: 'https://picsum.photos/id/1020/400/225',
-      accessLevel: 'BASIC',
+      accessLevel: 'BASIC' as const,
       tags: ['阅读', '快速定位', '理解技巧'],
       cognitiveObjectives: ['提高阅读速度', '增强理解能力', '培养阅读策略']
     },
@@ -149,7 +149,7 @@ async function main() {
       duration: '41:20',
       filePath: '/videos/listening-predict.mp4',
       thumbnail: 'https://picsum.photos/id/1021/400/225',
-      accessLevel: 'BASIC',
+      accessLevel: 'BASIC' as const,
       tags: ['听力', '预测技巧', '关键词识别'],
       cognitiveObjectives: ['提高听力预测能力', '增强关键词识别', '培养场景推断']
     }
@@ -216,7 +216,7 @@ async function main() {
           planId: basicPlan.id,
           startDate: new Date(),
           endDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000), // 30天后
-          status: 'ACTIVE'
+          status: 'ACTIVE' as const
         }
       })
     }

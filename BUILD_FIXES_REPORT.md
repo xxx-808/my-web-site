@@ -50,8 +50,12 @@
 
 #### Prisma枚举类型错误修复
 - **文件**: `prisma/seed.ts`
-- **问题**: `User` 模型的 `role` 字段类型不匹配，字符串不能赋值给枚举类型
+- **问题**: 多个模型的枚举字段类型不匹配，字符串不能赋值给枚举类型
 - **修复**: 使用 `as const` 断言确保字符串字面量类型
+- **具体修复**:
+  - `User.role`: `'STUDENT' as const`, `'ADMIN' as const`
+  - `Video.accessLevel`: `'BASIC' as const`, `'PREMIUM' as const`
+  - `Subscription.status`: `'ACTIVE' as const`
 - **改进**: 确保类型安全，避免运行时错误
 
 ### 2. 未使用变量警告修复
