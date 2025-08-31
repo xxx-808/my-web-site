@@ -248,3 +248,166 @@ export async function POST(request: NextRequest) {
     }, { status: 500 });
   }
 }
+
+// 更新视频（管理员权限）
+export async function PUT(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    // 验证管理员权限
+    if (!session?.user?.userId) {
+      return NextResponse.json({ 
+        error: 'Authentication required' 
+      }, { status: 401 });
+    }
+
+    const adminUser = await prisma.user.findUnique({
+      where: { id: session.user.userId as string }
+    });
+
+    if (!adminUser || adminUser.role !== 'ADMIN') {
+      return NextResponse.json({ 
+        error: 'Admin access required' 
+      }, { status: 403 });
+    }
+
+    const body = await request.json();
+    const { 
+      id,
+      title, 
+      description, 
+      categoryId, 
+      duration, 
+      filePath, 
+      thumbnail, 
+      accessLevel, 
+      tags, 
+      cognitiveObjectives,
+      status
+    } = body;
+
+    // 验证必填字段
+    if (!id) {
+      return NextResponse.json({ 
+        error: 'Video ID is required' 
+      }, { status: 400 });
+    }
+
+    // 检查视频是否存在
+    const existingVideo = await prisma.video.findUnique({
+      where: { id }
+    });
+
+    if (!existingVideo) {
+      return NextResponse.json({ 
+        error: 'Video not found' 
+      }, { status: 404 });
+    }
+
+    // 更新视频
+    const updatedVideo = await prisma.video.update({
+      where: { id },
+      data: {
+        ...(title && { title }),
+        ...(description && { description }),
+        ...(categoryId && { categoryId }),
+        ...(duration && { duration }),
+        ...(filePath && { filePath }),
+        ...(thumbnail && { thumbnail }),
+        ...(accessLevel && { accessLevel: accessLevel.toUpperCase() }),
+        ...(tags && { tags }),
+        ...(cognitiveObjectives && { cognitiveObjectives }),
+        ...(status && { status: status.toUpperCase() })
+      },
+      include: {
+        category: true
+      }
+    });
+
+    return NextResponse.json({
+      message: 'Video updated successfully',
+      video: {
+        id: updatedVideo.id,
+        title: updatedVideo.title,
+        description: updatedVideo.description,
+        category: updatedVideo.category,
+        accessLevel: updatedVideo.accessLevel,
+        status: updatedVideo.status,
+        updatedAt: updatedVideo.updatedAt
+      }
+    });
+
+  } catch (error) {
+    console.error('Admin update video error:', error);
+    return NextResponse.json({ 
+      error: 'Internal server error' 
+    }, { status: 500 });
+  }
+}
+
+// 删除视频（管理员权限）
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    // 验证管理员权限
+    if (!session?.user?.userId) {
+      return NextResponse.json({ 
+        error: 'Authentication required' 
+      }, { status: 401 });
+    }
+
+    const adminUser = await prisma.user.findUnique({
+      where: { id: session.user.userId as string }
+    });
+
+    if (!adminUser || adminUser.role !== 'ADMIN') {
+      return NextResponse.json({ 
+        error: 'Admin access required' 
+      }, { status: 403 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get('id');
+
+    if (!id) {
+      return NextResponse.json({ 
+        error: 'Video ID is required' 
+      }, { status: 400 });
+    }
+
+    // 检查视频是否存在
+    const existingVideo = await prisma.video.findUnique({
+      where: { id }
+    });
+
+    if (!existingVideo) {
+      return NextResponse.json({ 
+        error: 'Video not found' 
+      }, { status: 404 });
+    }
+
+    // 删除相关的访问记录和观看历史
+    await prisma.$transaction([
+      prisma.videoAccess.deleteMany({
+        where: { videoId: id }
+      }),
+      prisma.watchHistory.deleteMany({
+        where: { videoId: id }
+      }),
+      prisma.video.delete({
+        where: { id }
+      })
+    ]);
+
+    return NextResponse.json({
+      message: 'Video deleted successfully'
+    });
+
+  } catch (error) {
+    console.error('Admin delete video error:', error);
+    return NextResponse.json({ 
+      error: 'Internal server error' 
+    }, { status: 500 });
+  }
+}
