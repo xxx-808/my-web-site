@@ -34,6 +34,11 @@
 - **修复**: 为 `validatePassword` 函数的user参数添加具体类型
 - **改进**: `user: { email: string }` 替换 `user: any`
 
+#### NextAuth.js回调函数类型修复
+- **文件**: `lib/auth.ts`
+- **修复**: 替换jwt和session回调中的 `any` 类型
+- **改进**: 使用具体的类型联合 `User & { role?: string }` 和 `Session['user'] & { role?: string }`
+
 ### 2. 未使用变量警告修复
 
 #### 管理员页面清理

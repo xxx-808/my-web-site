@@ -73,17 +73,17 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user }: { token: JWT; user?: User }): Promise<JWT> {
       if (user) {
-        token.role = (user as any).role
+        token.role = (user as User & { role?: string }).role
         token.userId = user.id
       }
       return token
     },
     async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
       if (token.role) {
-        (session.user as any).role = token.role
+        (session.user as Session['user'] & { role?: string }).role = token.role
       }
       if (token.userId) {
-        (session.user as any).userId = token.userId
+        (session.user as Session['user'] & { userId?: string }).userId = token.userId
       }
       return session
     }
