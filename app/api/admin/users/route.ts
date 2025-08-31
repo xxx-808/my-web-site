@@ -91,7 +91,23 @@ export async function GET(request: NextRequest) {
     ]);
 
     // 处理用户数据
-    const processedUsers = users.map((user: any) => ({
+    const processedUsers = users.map((user: {
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+      createdAt: Date;
+      updatedAt: Date;
+      subscriptions: Array<{
+        id: string;
+        plan: { name: string; description: string };
+        startDate: Date;
+        endDate: Date;
+        status: string;
+      }>;
+      videoAccesses: Array<any>;
+      watchHistory: Array<{ lastWatched: Date }>;
+    }) => ({
       id: user.id,
       name: user.name,
       email: user.email,
