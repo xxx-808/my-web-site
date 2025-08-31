@@ -49,7 +49,6 @@ export default function VideoManagementPage() {
   const [activeTab, setActiveTab] = useState<'upload' | 'manage' | 'batch'>('upload');
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   // 数据状态
@@ -95,7 +94,6 @@ export default function VideoManagementPage() {
   }, [isAuthenticated]);
 
   const loadData = async () => {
-    setIsLoading(true);
     try {
       // 并行加载视频和分类数据
       const [videosResponse, categoriesResponse] = await Promise.all([
@@ -123,8 +121,6 @@ export default function VideoManagementPage() {
       }
     } catch (error) {
       console.error('Failed to load data:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 

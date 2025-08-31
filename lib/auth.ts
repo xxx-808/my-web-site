@@ -4,23 +4,6 @@ import type { Session, User } from 'next-auth'
 import type { JWT } from 'next-auth/jwt'
 import { prisma } from './prisma'
 
-type AppRole = 'STUDENT' | 'ADMIN'
-
-type AppJWT = JWT & { role?: AppRole; userId?: string }
-
-type AppSession = Session & {
-  user: Session['user'] & { role?: AppRole; userId?: string }
-}
-
-function hasRole(u: unknown): u is { role: AppRole } {
-  return (
-    typeof u === 'object' &&
-    u !== null &&
-    'role' in (u as Record<string, unknown>) &&
-    typeof (u as Record<string, unknown>).role === 'string'
-  )
-}
-
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
@@ -88,24 +71,21 @@ export const authOptions: NextAuthOptions = {
     maxAge: 60 * 60 * 24 * 30 // 30 days
   },
   callbacks: {
-    async jwt({ token, user }: { token: JWT; user?: User }): Promise<AppJWT> {
-      const t = token as AppJWT
-      if (user && hasRole(user)) {
-        t.role = user.role
-        t.userId = user.id
+    async jwt({ token, user }: { token: JWT; user?: User }): Promise<JWT> {
+      if (user) {
+        token.role = (user as any).role
+        token.userId = user.id
       }
-      return t
+      return token
     },
-    async session({ session, token }: { session: Session; token: JWT }): Promise<AppSession> {
-      const s = session as AppSession
-      const t = token as AppJWT
-      if (t.role) {
-        s.user.role = t.role
+    async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
+      if (token.role) {
+        (session.user as any).role = token.role
       }
-      if (t.userId) {
-        s.user.userId = t.userId
+      if (token.userId) {
+        (session.user as any).userId = token.userId
       }
-      return s
+      return session
     }
   },
   pages: {

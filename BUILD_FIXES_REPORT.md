@@ -18,6 +18,12 @@
 - **修复**: 将所有 `session?.user?.id` 替换为 `session?.user?.userId`
 - **改进**: 符合NextAuth.js的类型定义，避免类型错误
 
+#### NextAuth.js类型扩展
+- **文件**: `types/next-auth.d.ts`, `lib/auth.ts`
+- **问题**: NextAuth.js默认类型不包含自定义字段
+- **修复**: 创建类型声明文件扩展NextAuth.js类型，简化auth.ts中的类型定义
+- **改进**: 提供正确的类型支持，避免TypeScript编译错误
+
 #### API文件中的any类型修复
 - **文件**: 多个API文件 (`app/api/admin/subscriptions/route.ts`, `app/api/admin/users/route.ts`, 等)
 - **修复**: 将 `any` 类型替换为 `Record<string, unknown>` 或具体类型
@@ -34,6 +40,11 @@
 - **文件**: `app/admin/page.tsx`
 - **修复**: 移除未使用的视频管理状态变量
 - **改进**: 这些功能已移至专门的视频管理页面
+
+#### 视频管理页面清理
+- **文件**: `app/admin/video-management/page.tsx`
+- **修复**: 移除未使用的 `isLoading` 状态变量
+- **改进**: 简化状态管理，避免未使用变量警告
 
 #### 变量重命名
 - **文件**: `app/api/video/[id]/route.ts`
