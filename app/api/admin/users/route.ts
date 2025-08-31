@@ -139,14 +139,14 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
     
     // 验证管理员权限
-    if (!session?.user?.id) {
+    if (!session?.user?.userId) {
       return NextResponse.json({ 
         error: 'Authentication required' 
       }, { status: 401 });
     }
 
     const adminUser = await prisma.user.findUnique({
-      where: { id: session.user.id as string }
+      where: { id: session.user.userId as string }
     });
 
     if (!adminUser || adminUser.role !== 'ADMIN') {

@@ -8,13 +8,13 @@ export async function GET(request: NextRequest) {
     // 获取用户会话
     const session = await getServerSession(authOptions);
     
-    if (!session?.user?.id) {
+    if (!session?.user?.userId) {
       return NextResponse.json({ 
         error: 'Authentication required' 
       }, { status: 401 });
     }
 
-    const userId = session.user.id as string;
+    const userId = session.user.userId as string;
 
     // 获取查询参数
     const { searchParams } = new URL(request.url);

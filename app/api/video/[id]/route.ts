@@ -13,13 +13,13 @@ export async function GET(
     // 获取用户会话
     const session = await getServerSession(authOptions);
     
-    if (!session?.user?.id) {
+    if (!session?.user?.userId) {
       return NextResponse.json({ 
         error: 'Authentication required' 
       }, { status: 401 });
     }
 
-    const userId = session.user.id as string;
+    const userId = session.user.userId as string;
 
     // 从数据库查询视频
     const video = await prisma.video.findUnique({

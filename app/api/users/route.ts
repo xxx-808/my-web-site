@@ -8,13 +8,13 @@ export async function GET() {
     // 获取用户会话
     const session = await getServerSession(authOptions);
     
-    if (!session?.user?.id) {
+    if (!session?.user?.userId) {
       return NextResponse.json({ 
         error: 'Authentication required' 
       }, { status: 401 });
     }
 
-    const userId = session.user.id as string;
+    const userId = session.user.userId as string;
 
     // 获取用户详细信息
     const user = await prisma.user.findUnique({
@@ -111,13 +111,13 @@ export async function PUT(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     
-    if (!session?.user?.id) {
+    if (!session?.user?.userId) {
       return NextResponse.json({ 
         error: 'Authentication required' 
       }, { status: 401 });
     }
 
-    const userId = session.user.id as string;
+    const userId = session.user.userId as string;
     const body = await request.json();
 
     // 只允许更新特定字段

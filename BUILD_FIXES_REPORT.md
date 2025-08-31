@@ -12,6 +12,12 @@
 - **修复**: 移除未使用的request参数，修复any类型声明
 - **改进**: 使用具体的类型替换any
 
+#### NextAuth.js Session类型错误
+- **文件**: 所有API文件
+- **问题**: `session.user.id` 不存在，应该使用 `session.user.userId`
+- **修复**: 将所有 `session?.user?.id` 替换为 `session?.user?.userId`
+- **改进**: 符合NextAuth.js的类型定义，避免类型错误
+
 #### API文件中的any类型修复
 - **文件**: 多个API文件 (`app/api/admin/subscriptions/route.ts`, `app/api/admin/users/route.ts`, 等)
 - **修复**: 将 `any` 类型替换为 `Record<string, unknown>` 或具体类型
