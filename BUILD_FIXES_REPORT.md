@@ -72,6 +72,15 @@
   - 添加 `tsx` 依赖用于运行 seed 脚本
 - **改进**: 确保在构建过程中生成最新的 Prisma Client
 
+#### 运行时错误修复
+- **文件**: `app/api/admin/users/route.ts`
+- **问题**: 运行时出现 "Internal server error"，可能是由于 session 类型不一致
+- **修复**: 
+  - 确保所有 session 检查使用 `session?.user?.userId`
+  - 改进错误处理，添加详细错误日志
+  - 修复类型错误
+- **改进**: 提供更好的错误诊断和调试信息
+
 ### 2. 未使用变量警告修复
 
 #### 管理员页面清理

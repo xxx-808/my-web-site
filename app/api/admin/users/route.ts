@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
     
     // 验证管理员权限
-    if (!session?.user?.id) {
+    if (!session?.user?.userId) {
       return NextResponse.json({ 
         error: 'Authentication required' 
       }, { status: 401 });
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     // 检查是否为管理员
     const adminUser = await prisma.user.findUnique({
-      where: { id: session.user.id as string }
+      where: { id: session.user.userId as string }
     });
 
     if (!adminUser || adminUser.role !== 'ADMIN') {
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
     ]);
 
     // 处理用户数据
-    const processedUsers = users.map(user => ({
+    const processedUsers = users.map((user: any) => ({
       id: user.id,
       name: user.name,
       email: user.email,
@@ -127,8 +127,14 @@ export async function GET(request: NextRequest) {
 
   } catch (error) {
     console.error('Admin users API error:', error);
+    console.error('Error details:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : 'Unknown'
+    });
     return NextResponse.json({ 
-      error: 'Internal server error' 
+      error: 'Internal server error',
+      details: process.env.NODE_ENV === 'development' ? error instanceof Error ? error.message : 'Unknown error' : undefined
     }, { status: 500 });
   }
 }
