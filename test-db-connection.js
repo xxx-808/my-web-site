@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 
 const prisma = new PrismaClient();
 
-async function testDatabase() {
+async function testDatabaseConnection() {
   try {
     console.log('🔍 测试数据库连接...');
     
@@ -41,6 +41,20 @@ async function testDatabase() {
       console.log(`  - ${user.name} (${user.email}) - ${user.role}`);
     });
     
+    // 列出所有分类
+    const categories = await prisma.videoCategory.findMany({
+      select: {
+        id: true,
+        name: true,
+        displayName: true
+      }
+    });
+    
+    console.log('📚 分类列表:');
+    categories.forEach(category => {
+      console.log(`  - ${category.displayName} (${category.name})`);
+    });
+    
     console.log('🎉 数据库测试完成');
     
   } catch (error) {
@@ -50,4 +64,4 @@ async function testDatabase() {
   }
 }
 
-testDatabase();
+testDatabaseConnection();

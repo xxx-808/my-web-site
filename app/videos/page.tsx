@@ -135,19 +135,17 @@ export default function VideosPage() {
       const response = await fetch('/api/videos');
       if (response.ok) {
         const data = await response.json();
-        setVideos(data.videos);
+        setVideos(data.videos || []);
         setPlan(data.userSubscription?.planName === 'premium' ? 'pro' : 'basic');
       } else {
         console.error('Failed to fetch videos');
-        // 回退到模拟数据
-        const sorted = [...sampleVideos].sort((a, b) => (a.uploadedAt < b.uploadedAt ? 1 : -1));
-        setVideos(sorted);
+        // 不设置回退数据，保持空数组
+        setVideos([]);
       }
     } catch (error) {
       console.error('Error fetching videos:', error);
-      // 回退到模拟数据
-      const sorted = [...sampleVideos].sort((a, b) => (a.uploadedAt < b.uploadedAt ? 1 : -1));
-      setVideos(sorted);
+      // 不设置回退数据，保持空数组
+      setVideos([]);
     } finally {
       setIsLoading(false);
     }
@@ -283,63 +281,73 @@ export default function VideosPage() {
                     </h3>
                     
                     <div className="grid md:grid-cols-2 gap-4">
-                      {grouped[section.key].map((video) => (
-                        <div
-                          key={video.id}
-                          onClick={() => handleVideoSelect(video)}
-                          className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
-                            selectedVideo?.id === video.id
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:border-gray-300'
-                          } ${!video.canAccess ? 'opacity-60' : ''}`}
-                        >
-                          <div className="flex gap-3">
-                            <img
-                              src={video.thumbnail}
-                              alt={video.title}
-                              className="w-20 h-12 object-cover rounded"
-                            />
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-start justify-between">
-                                <h4 className="text-sm font-medium text-gray-900 truncate">
-                                  {video.title}
-                                </h4>
-                                <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
-                                  video.accessLevel === "pro"
-                                    ? "bg-purple-100 text-purple-800"
-                                    : "bg-green-100 text-green-800"
-                                }`}>
-                                  {video.accessLevel === "pro" ? "Pro" : "Basic"}
-                                </span>
-                              </div>
-                              <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                                {video.description}
-                              </p>
-                              <div className="flex items-center justify-between mt-2">
-                                <span className="text-xs text-gray-400">{video.duration}</span>
-                                {video.watchProgress > 0 && (
-                                  <div className="flex items-center gap-1">
-                                    <div className="w-16 bg-gray-200 rounded-full h-1">
-                                      <div
-                                        className="bg-blue-600 h-1 rounded-full"
-                                        style={{ width: `${video.watchProgress}%` }}
-                                      ></div>
+                      {grouped[section.key].length === 0 ? (
+                        <div className="col-span-2 text-center py-8">
+                          <div className="text-gray-400">
+                            <div className="text-4xl mb-2">📹</div>
+                            <div className="text-sm">该分类暂无视频</div>
+                            <div className="text-xs text-gray-300 mt-1">管理员正在准备课程内容</div>
+                          </div>
+                        </div>
+                      ) : (
+                        grouped[section.key].map((video) => (
+                          <div
+                            key={video.id}
+                            onClick={() => handleVideoSelect(video)}
+                            className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
+                              selectedVideo?.id === video.id
+                                ? 'border-blue-500 bg-blue-50'
+                                : 'border-gray-200 hover:border-gray-300'
+                            } ${!video.canAccess ? 'opacity-60' : ''}`}
+                          >
+                            <div className="flex gap-3">
+                              <img
+                                src={video.thumbnail}
+                                alt={video.title}
+                                className="w-20 h-12 object-cover rounded"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-start justify-between">
+                                  <h4 className="text-sm font-medium text-gray-900 truncate">
+                                    {video.title}
+                                  </h4>
+                                  <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
+                                    video.accessLevel === "pro"
+                                      ? "bg-purple-100 text-purple-800"
+                                      : "bg-green-100 text-green-800"
+                                  }`}>
+                                    {video.accessLevel === "pro" ? "Pro" : "Basic"}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1 line-clamp-2">
+                                  {video.description}
+                                </p>
+                                <div className="flex items-center justify-between mt-2">
+                                  <span className="text-xs text-gray-400">{video.duration}</span>
+                                  {video.watchProgress > 0 && (
+                                    <div className="flex items-center gap-1">
+                                      <div className="w-16 bg-gray-200 rounded-full h-1">
+                                        <div
+                                          className="bg-blue-600 h-1 rounded-full"
+                                          style={{ width: `${video.watchProgress}%` }}
+                                        ></div>
+                                      </div>
+                                      <span className="text-xs text-gray-500">{video.watchProgress}%</span>
                                     </div>
-                                    <span className="text-xs text-gray-500">{video.watchProgress}%</span>
+                                  )}
+                                </div>
+                                {!video.canAccess && (
+                                  <div className="mt-2">
+                                    <span className="text-xs text-red-600 font-medium">
+                                      {video.accessLevel === "pro" ? "需要 Pro 套餐" : "无访问权限"}
+                                    </span>
                                   </div>
                                 )}
                               </div>
-                              {!video.canAccess && (
-                                <div className="mt-2">
-                                  <span className="text-xs text-red-600 font-medium">
-                                    {video.accessLevel === "pro" ? "需要 Pro 套餐" : "无访问权限"}
-                                  </span>
-                                </div>
-                              )}
                             </div>
                           </div>
-                        </div>
-                      ))}
+                        ))
+                      )}
                     </div>
                   </div>
                 ))}

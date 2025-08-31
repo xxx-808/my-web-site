@@ -533,54 +533,66 @@ export default function VideoManagementPage() {
                     </tr>
                   </thead>
                   <tbody className="bg-white divide-y divide-gray-200">
-                    {videos.map((video) => (
-                      <tr key={video.id}>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <img
-                              className="h-12 w-20 object-cover rounded"
-                              src={video.thumbnail}
-                              alt={video.title}
-                            />
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">
-                                {video.title}
-                              </div>
-                              <div className="text-sm text-gray-500">
-                                {video.description.substring(0, 50)}...
-                              </div>
-                            </div>
+                    {videos.length === 0 ? (
+                      <tr>
+                        <td colSpan={5} className="px-6 py-12 text-center">
+                          <div className="text-gray-500">
+                            <div className="text-6xl mb-4">📹</div>
+                            <div className="text-lg font-medium mb-2">暂无视频</div>
+                            <div className="text-sm">请在上传视频标签页中添加您的第一个视频</div>
                           </div>
                         </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                            {video.category.displayName}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                            video.accessLevel === 'PREMIUM' 
-                              ? 'bg-purple-100 text-purple-800' 
-                              : 'bg-green-100 text-green-800'
-                          }`}>
-                            {video.accessLevel}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          <div>访问: {video.stats.accessCount}</div>
-                          <div>观看: {video.stats.watchCount}</div>
-                          <div>进度: {video.stats.averageProgress.toFixed(1)}%</div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <button
-                            onClick={() => handleDeleteVideo(video.id)}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            删除
-                          </button>
-                        </td>
                       </tr>
-                    ))}
+                    ) : (
+                      videos.map((video) => (
+                        <tr key={video.id}>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <img
+                                className="h-12 w-20 object-cover rounded"
+                                src={video.thumbnail}
+                                alt={video.title}
+                              />
+                              <div className="ml-4">
+                                <div className="text-sm font-medium text-gray-900">
+                                  {video.title}
+                                </div>
+                                <div className="text-sm text-gray-500">
+                                  {video.description.substring(0, 50)}...
+                                </div>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                              {video.category.displayName}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
+                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                              video.accessLevel === 'PREMIUM' 
+                                ? 'bg-purple-100 text-purple-800' 
+                                : 'bg-green-100 text-green-800'
+                            }`}>
+                              {video.accessLevel}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div>访问: {video.stats.accessCount}</div>
+                            <div>观看: {video.stats.watchCount}</div>
+                            <div>进度: {video.stats.averageProgress.toFixed(1)}%</div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button
+                              onClick={() => handleDeleteVideo(video.id)}
+                              className="text-red-600 hover:text-red-900"
+                            >
+                              删除
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
                   </tbody>
                 </table>
               </div>
@@ -592,53 +604,71 @@ export default function VideoManagementPage() {
             <div className="bg-white shadow rounded-lg p-6">
               <h2 className="text-xl font-semibold mb-4">视频访问权限管理</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    选择视频
-                  </label>
-                  <select
-                    value={selectedVideoForAccess?.id || ''}
-                    onChange={(e) => {
-                      const video = videos.find(v => v.id === e.target.value);
-                      setSelectedVideoForAccess(video || null);
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="">选择视频</option>
-                    {videos.map((video) => (
-                      <option key={video.id} value={video.id}>
-                        {video.title}
-                      </option>
-                    ))}
-                  </select>
+              {videos.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-gray-500">
+                    <div className="text-6xl mb-4">🔐</div>
+                    <div className="text-lg font-medium mb-2">暂无视频可管理</div>
+                    <div className="text-sm mb-4">请先在上传视频标签页中添加视频，然后才能管理访问权限</div>
+                    <button
+                      onClick={() => setActiveTab('upload')}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      去上传视频
+                    </button>
+                  </div>
                 </div>
+              ) : (
+                <>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        选择视频
+                      </label>
+                      <select
+                        value={selectedVideoForAccess?.id || ''}
+                        onChange={(e) => {
+                          const video = videos.find(v => v.id === e.target.value);
+                          setSelectedVideoForAccess(video || null);
+                        }}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">选择视频</option>
+                        {videos.map((video) => (
+                          <option key={video.id} value={video.id}>
+                            {video.title}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    选择用户
-                  </label>
-                  <select
-                    value={selectedUserForAccess}
-                    onChange={(e) => setSelectedUserForAccess(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        选择用户
+                      </label>
+                      <select
+                        value={selectedUserForAccess}
+                        onChange={(e) => setSelectedUserForAccess(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">选择用户</option>
+                        {users.filter(user => user.role === 'STUDENT').map((user) => (
+                          <option key={user.id} value={user.id}>
+                            {user.name} ({user.email})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleGrantAccess}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
                   >
-                    <option value="">选择用户</option>
-                    {users.filter(user => user.role === 'STUDENT').map((user) => (
-                      <option key={user.id} value={user.id}>
-                        {user.name} ({user.email})
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <button
-                onClick={handleGrantAccess}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-              >
-                分配访问权限
-              </button>
+                    分配访问权限
+                  </button>
+                </>
+              )}
 
               {selectedVideoForAccess && (
                 <div className="mt-8">
@@ -724,51 +754,69 @@ export default function VideoManagementPage() {
             <div className="bg-white shadow rounded-lg p-6">
               <h2 className="text-xl font-semibold mb-4">批量操作</h2>
               
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  选择视频
-                </label>
-                <div className="space-y-2 max-h-60 overflow-y-auto">
-                  {videos.map((video) => (
-                    <label key={video.id} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={selectedVideos.includes(video.id)}
-                        onChange={(e) => {
-                          if (e.target.checked) {
-                            setSelectedVideos([...selectedVideos, video.id]);
-                          } else {
-                            setSelectedVideos(selectedVideos.filter(id => id !== video.id));
-                          }
-                        }}
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      <span className="ml-2 text-sm text-gray-700">{video.title}</span>
-                    </label>
-                  ))}
+              {videos.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="text-gray-500">
+                    <div className="text-6xl mb-4">⚡</div>
+                    <div className="text-lg font-medium mb-2">暂无视频可操作</div>
+                    <div className="text-sm mb-4">请先在上传视频标签页中添加视频，然后才能进行批量操作</div>
+                    <button
+                      onClick={() => setActiveTab('upload')}
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      去上传视频
+                    </button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <>
+                  <div className="mb-6">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      选择视频
+                    </label>
+                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                      {videos.map((video) => (
+                        <label key={video.id} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedVideos.includes(video.id)}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedVideos([...selectedVideos, video.id]);
+                              } else {
+                                setSelectedVideos(selectedVideos.filter(id => id !== video.id));
+                              }
+                            }}
+                            className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                          />
+                          <span className="ml-2 text-sm text-gray-700">{video.title}</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
 
-              <div className="space-x-4">
-                <button
-                  onClick={() => handleBatchOperation('delete')}
-                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
-                >
-                  批量删除
-                </button>
-                <button
-                  onClick={() => handleBatchOperation('activate')}
-                  className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                >
-                  批量激活
-                </button>
-                <button
-                  onClick={() => handleBatchOperation('deactivate')}
-                  className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors"
-                >
-                  批量停用
-                </button>
-              </div>
+                  <div className="space-x-4">
+                    <button
+                      onClick={() => handleBatchOperation('delete')}
+                      className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      批量删除
+                    </button>
+                    <button
+                      onClick={() => handleBatchOperation('activate')}
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
+                    >
+                      批量激活
+                    </button>
+                    <button
+                      onClick={() => handleBatchOperation('deactivate')}
+                      className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors"
+                    >
+                      批量停用
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>
