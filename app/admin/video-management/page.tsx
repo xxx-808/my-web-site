@@ -66,16 +66,6 @@ export default function VideoManagementPage() {
     cognitiveObjectives: [] as string[]
   });
 
-  useEffect(() => {
-    checkAuthentication();
-  }, [checkAuthentication]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadData();
-    }
-  }, [isAuthenticated]);
-
   const checkAuthentication = useCallback(() => {
     try {
       const raw = localStorage.getItem("tc_auth");
@@ -93,6 +83,16 @@ export default function VideoManagementPage() {
       router.push("/admin-login");
     }
   }, [router]);
+
+  useEffect(() => {
+    checkAuthentication();
+  }, [checkAuthentication]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [isAuthenticated]);
 
   const loadData = async () => {
     setIsLoading(true);

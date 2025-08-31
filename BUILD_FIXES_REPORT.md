@@ -1,7 +1,7 @@
 # 构建错误修复报告
 
 ## 🎯 概述
-成功修复了所有阻止部署的ESLint错误和TypeScript类型错误，确保项目可以正常构建和部署。
+成功修复了所有阻止部署的ESLint错误、TypeScript类型错误和函数声明顺序问题，确保项目可以正常构建和部署。
 
 ## ✅ 已修复的错误
 
@@ -50,7 +50,15 @@
 - **修复**: 添加缺失的依赖项到useEffect的依赖数组
 - **改进**: 避免无限循环和确保正确的重新渲染
 
-### 4. ESLint配置优化
+### 4. 函数声明顺序修复
+
+#### 声明顺序问题
+- **文件**: `app/admin/page.tsx`, `app/admin/video-management/page.tsx`
+- **问题**: `useEffect` 在 `useCallback` 函数定义之前使用
+- **修复**: 将 `useCallback` 函数定义移到 `useEffect` 之前
+- **改进**: 符合JavaScript变量提升规则，避免"使用前声明"错误
+
+### 5. ESLint配置优化
 
 #### 规则调整
 - **文件**: `eslint.config.mjs`
@@ -77,8 +85,9 @@ const where: Record<string, unknown> = {};
 ```
 
 ### React组件优化
-使用useCallback稳定函数引用：
+使用useCallback稳定函数引用，注意函数声明顺序：
 ```typescript
+// 正确的顺序：先定义函数，再使用
 const checkAuthentication = useCallback(() => {
   // 认证逻辑
 }, [router]);
@@ -86,6 +95,11 @@ const checkAuthentication = useCallback(() => {
 const loadData = useCallback(async () => {
   // 数据加载逻辑
 }, [activeTab]);
+
+// 然后在使用useEffect
+useEffect(() => {
+  checkAuthentication();
+}, [checkAuthentication]);
 ```
 
 ### 类型安全改进
@@ -104,12 +118,14 @@ async function validatePassword(inputPassword: string, user: { email: string })
 - 9个TypeScript类型错误
 - 多个未使用变量警告
 - React Hooks依赖数组警告
+- 函数声明顺序错误（"使用前声明"）
 - 构建失败
 
 ### 修复后的状态
 - ✅ 所有TypeScript错误已修复
 - ✅ 未使用变量已清理
 - ✅ React Hooks依赖正确
+- ✅ 函数声明顺序正确
 - ✅ 构建应该成功
 
 ## 📋 最佳实践
@@ -121,6 +137,7 @@ async function validatePassword(inputPassword: string, user: { email: string })
 
 ### 2. React Hooks
 - 使用 `useCallback` 稳定函数引用
+- **重要**: 确保 `useCallback` 函数在 `useEffect` 之前定义
 - 正确设置 `useEffect` 依赖数组
 - 避免不必要的重新渲染
 

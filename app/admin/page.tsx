@@ -75,16 +75,6 @@ export default function AdminPage() {
 
   // 移除未使用的视频管理状态（已移到专门的视频管理页面）
 
-  useEffect(() => {
-    checkAuthentication();
-  }, [checkAuthentication]);
-
-  useEffect(() => {
-    if (isAuthenticated) {
-      loadData();
-    }
-  }, [isAuthenticated, activeTab, loadData]);
-
   const checkAuthentication = useCallback(() => {
     try {
       const raw = localStorage.getItem("tc_auth");
@@ -131,6 +121,16 @@ export default function AdminPage() {
       setIsLoading(false);
     }
   }, [activeTab]);
+
+  useEffect(() => {
+    checkAuthentication();
+  }, [checkAuthentication]);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [isAuthenticated, activeTab, loadData]);
 
   const handleAddUser = async () => {
     if (!newUser.name || !newUser.email) {
