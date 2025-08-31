@@ -64,6 +64,14 @@
 - **修复**: 将 `findUnique` 改为 `findFirst` 查询
 - **改进**: 使用正确的查询方法，避免类型错误
 
+#### Prisma客户端初始化错误修复
+- **文件**: `package.json`
+- **问题**: Vercel 缓存依赖项导致 Prisma Client 未正确生成
+- **修复**: 
+  - 在构建脚本中添加 `prisma generate` 命令
+  - 添加 `tsx` 依赖用于运行 seed 脚本
+- **改进**: 确保在构建过程中生成最新的 Prisma Client
+
 ### 2. 未使用变量警告修复
 
 #### 管理员页面清理
