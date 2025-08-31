@@ -149,14 +149,15 @@ async function main() {
     })
 
     if (category) {
+      const { categoryName, ...videoData } = video;
       await prisma.video.upsert({
         where: { title: video.title },
         update: {
-          ...video,
+          ...videoData,
           categoryId: category.id
         },
         create: {
-          ...video,
+          ...videoData,
           categoryId: category.id
         }
       })

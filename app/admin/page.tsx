@@ -1,174 +1,232 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
-interface UserAccess {
+interface UserData {
   id: string;
   name: string;
   email: string;
-  ipAddress: string;
-  accessLevel: 'basic' | 'premium' | 'admin';
-  accessUntil: string;
-  allowedVideos: string[];
+  role: string;
   createdAt: string;
-  lastAccess: string;
+  subscription: {
+    id: string;
+    planName: string;
+    planDescription: string;
+    endDate: string;
+    daysRemaining: number;
+  } | null;
+  stats: {
+    videoAccessCount: number;
+    lastActivity: string | null;
+  };
 }
 
-interface VideoAccess {
+interface VideoData {
   id: string;
   title: string;
-  allowedIPs: string[];
-  expiresAt: string;
-  allowDownload: boolean;
-  allowScreenRecord: boolean;
+  description: string;
+  category: {
+    name: string;
+    displayName: string;
+  };
+  accessLevel: string;
+  status: string;
+  createdAt: string;
+  stats: {
+    accessCount: number;
+    watchCount: number;
+    averageProgress: number;
+  };
 }
 
-// Define a proper type for creating a new user to avoid literal narrowing
-type NewUser = {
-  name: string;
-  email: string;
-  ipAddress: string;
-  accessLevel: 'basic' | 'premium' | 'admin';
-  accessUntil: string;
-  allowedVideos: string[];
-};
-
-const sampleUsers: UserAccess[] = [
-  {
-    id: "1",
-    name: "张三",
-    email: "zhangsan@example.com",
-    ipAddress: "192.168.1.100",
-    accessLevel: "premium",
-    accessUntil: "2025-12-31",
-    allowedVideos: ["ielts-writing-task1", "ielts-speaking-part2", "ielts-reading-skills"],
-    createdAt: "2024-01-15",
-    lastAccess: "2024-08-19",
-  },
-  {
-    id: "2",
-    name: "李四",
-    email: "lisi@example.com",
-    ipAddress: "192.168.1.101",
-    accessLevel: "basic",
-    accessUntil: "2024-12-31",
-    allowedVideos: ["ielts-writing-task1"],
-    createdAt: "2024-02-20",
-    lastAccess: "2024-08-18",
-  },
-];
-
-const sampleVideos: VideoAccess[] = [
-  {
-    id: "ielts-writing-task1",
-    title: "雅思写作 Task 1 - 图表描述技巧",
-    allowedIPs: ["192.168.1.100", "192.168.1.101"],
-    expiresAt: "2025-12-31",
-    allowDownload: false,
-    allowScreenRecord: false,
-  },
-  {
-    id: "ielts-speaking-part2",
-    title: "雅思口语 Part 2 - 话题展开策略",
-    allowedIPs: ["192.168.1.100"],
-    expiresAt: "2025-12-31",
-    allowDownload: false,
-    allowScreenRecord: false,
-  },
-  {
-    id: "ielts-reading-skills",
-    title: "雅思阅读 - 快速定位与理解技巧",
-    allowedIPs: ["192.168.1.100"],
-    expiresAt: "2025-12-31",
-    allowDownload: false,
-    allowScreenRecord: false,
-  },
-];
+interface AnalyticsData {
+  overview: {
+    totalUsers: number;
+    totalVideos: number;
+    activeSubscriptions: number;
+    totalRevenue: number;
+  };
+  userStats: {
+    byRole: Array<{ role: string; count: number }>;
+  };
+  videoStats: {
+    byCategory: Array<{ categoryName: string; count: number }>;
+    topVideos: Array<{ title: string; watchCount: number; avgProgress: number }>;
+  };
+}
 
 export default function AdminPage() {
-  const [users, setUsers] = useState<UserAccess[]>(sampleUsers);
-  const [videos, setVideos] = useState<VideoAccess[]>(sampleVideos);
-  const [activeTab, setActiveTab] = useState<'users' | 'videos' | 'analytics'>('users');
-  const [showAddUser, setShowAddUser] = useState(false);
-  const [showAddVideo, setShowAddVideo] = useState(false);
+  const router = useRouter();
+  const [users, setUsers] = useState<UserData[]>([]);
+  const [videos, setVideos] = useState<VideoData[]>([]);
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [activeTab, setActiveTab] = useState<'users' | 'videos' | 'analytics'>('analytics');
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  const [newUser, setNewUser] = useState<NewUser>({
+  // 用户管理状态
+  const [showAddUser, setShowAddUser] = useState(false);
+  const [newUser, setNewUser] = useState({
     name: "",
     email: "",
-    ipAddress: "",
-    accessLevel: "basic",
-    accessUntil: "",
-    allowedVideos: [] as string[],
+    role: "STUDENT"
   });
 
+  // 视频管理状态
+  const [showAddVideo, setShowAddVideo] = useState(false);
   const [newVideo, setNewVideo] = useState({
     title: "",
-    allowedIPs: [] as string[],
-    expiresAt: "",
-    allowDownload: false,
-    allowScreenRecord: false,
+    description: "",
+    categoryId: "",
+    accessLevel: "BASIC"
   });
 
-  const handleAddUser = () => {
-    if (newUser.name && newUser.email && newUser.ipAddress) {
-      const user: UserAccess = {
-        id: Date.now().toString(),
-        ...newUser,
-        createdAt: new Date().toISOString().split('T')[0],
-        lastAccess: new Date().toISOString().split('T')[0],
-      };
-      setUsers([...users, user]);
-      setNewUser({
-        name: "",
-        email: "",
-        ipAddress: "",
-        accessLevel: "basic",
-        accessUntil: "",
-        allowedVideos: [],
-      });
-      setShowAddUser(false);
+  useEffect(() => {
+    checkAuthentication();
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [isAuthenticated, activeTab]);
+
+  const checkAuthentication = () => {
+    try {
+      const raw = localStorage.getItem("tc_auth");
+      if (raw) {
+        const parsed = JSON.parse(raw) as { role: string; id: string };
+        if (parsed.role === "ADMIN") {
+          setIsAuthenticated(true);
+        } else {
+          router.push("/admin-login");
+        }
+      } else {
+        router.push("/admin-login");
+      }
+    } catch {
+      router.push("/admin-login");
     }
   };
 
-  const handleAddVideo = () => {
-    if (newVideo.title) {
-      const video: VideoAccess = {
-        id: newVideo.title.toLowerCase().replace(/\s+/g, '-'),
-        ...newVideo,
-      };
-      setVideos([...videos, video]);
-      setNewVideo({
-        title: "",
-        allowedIPs: [],
-        expiresAt: "",
-        allowDownload: false,
-        allowScreenRecord: false,
-      });
-      setShowAddVideo(false);
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      if (activeTab === 'analytics') {
+        const response = await fetch('/api/admin/analytics');
+        if (response.ok) {
+          const data = await response.json();
+          setAnalytics(data);
+        }
+      } else if (activeTab === 'users') {
+        const response = await fetch('/api/admin/users');
+        if (response.ok) {
+          const data = await response.json();
+          setUsers(data.users);
+        }
+      } else if (activeTab === 'videos') {
+        const response = await fetch('/api/admin/videos');
+        if (response.ok) {
+          const data = await response.json();
+          setVideos(data.videos);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load data:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const removeUser = (userId: string) => {
-    setUsers(users.filter(user => user.id !== userId));
+  const handleAddUser = async () => {
+    if (!newUser.name || !newUser.email) {
+      alert("请填写完整信息");
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/admin/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newUser),
+      });
+
+      if (response.ok) {
+        alert("用户创建成功");
+        setNewUser({ name: "", email: "", role: "STUDENT" });
+        setShowAddUser(false);
+        loadData();
+      } else {
+        const error = await response.json();
+        alert(error.error || "创建失败");
+      }
+    } catch (error) {
+      console.error('Failed to create user:', error);
+      alert("创建失败");
+    }
   };
 
-  const removeVideo = (videoId: string) => {
-    setVideos(videos.filter(video => video.id !== videoId));
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm("确定要删除该用户吗？")) return;
+
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE',
+      });
+
+      if (response.ok) {
+        alert("用户删除成功");
+        loadData();
+      } else {
+        const error = await response.json();
+        alert(error.error || "删除失败");
+      }
+    } catch (error) {
+      console.error('Failed to delete user:', error);
+      alert("删除失败");
+    }
   };
 
-  const updateVideoAccess = (videoId: string, field: keyof VideoAccess, value: string | boolean) => {
-    setVideos(videos.map(video => 
-      video.id === videoId ? { ...video, [field]: value } : video
-    ));
+  const handleUpdateVideoStatus = async (videoId: string, status: string) => {
+    try {
+      const response = await fetch(`/api/admin/videos/${videoId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status }),
+      });
+
+      if (response.ok) {
+        alert("状态更新成功");
+        loadData();
+      } else {
+        const error = await response.json();
+        alert(error.error || "更新失败");
+      }
+    } catch (error) {
+      console.error('Failed to update video status:', error);
+      alert("更新失败");
+    }
   };
 
-  const handleTabClick = (tabId: 'users' | 'videos' | 'analytics') => {
-    setActiveTab(tabId);
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('zh-CN');
   };
 
-  const handleReturnHome = () => {
-    window.location.href = "/";
-  };
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">验证管理员权限...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -177,8 +235,8 @@ export default function AdminPage() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Tiffany&rsquo;s College 管理后台</h1>
-              <p className="text-sm text-gray-600">IP权限管理 • 视频访问控制 • 用户管理</p>
+              <h1 className="text-2xl font-bold text-gray-900">🔧 管理员控制台</h1>
+              <p className="text-sm text-gray-600">用户管理 • 视频管理 • 数据分析</p>
             </div>
             <div className="flex items-center gap-4">
               <span className="text-sm text-gray-500">
@@ -186,10 +244,16 @@ export default function AdminPage() {
                 管理员模式
               </span>
               <button
-                onClick={handleReturnHome}
+                onClick={() => router.push("/admin/video-management")}
                 className="text-gray-600 hover:text-gray-900"
               >
-                返回首页
+                📺 视频管理
+              </button>
+              <button
+                onClick={() => router.push("/")}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                🏠 返回首页
               </button>
             </div>
           </div>
@@ -201,33 +265,126 @@ export default function AdminPage() {
         <div className="border-b border-gray-200 mb-6">
           <nav className="-mb-px flex space-x-8">
             {[
-              { id: 'users', label: '用户管理', count: users.length },
-              { id: 'videos', label: '视频权限', count: videos.length },
-              { id: 'analytics', label: '访问统计', count: 0 },
+              { id: 'analytics', label: '数据分析', icon: '📊' },
+              { id: 'users', label: '用户管理', icon: '👥' },
+              { id: 'videos', label: '视频管理', icon: '🎥' }
             ].map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => handleTabClick(tab.id as 'users' | 'videos' | 'analytics')}
-                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                onClick={() => setActiveTab(tab.id as 'users' | 'videos' | 'analytics')}
+                className={`py-2 px-1 border-b-2 font-medium text-sm flex items-center gap-2 ${
                   activeTab === tab.id
                     ? 'border-blue-500 text-blue-600'
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                 }`}
               >
+                <span>{tab.icon}</span>
                 {tab.label}
-                <span className="ml-2 bg-gray-100 text-gray-900 py-0.5 px-2.5 rounded-full text-xs">
-                  {tab.count}
-                </span>
               </button>
             ))}
           </nav>
         </div>
 
-        {/* Content */}
-        {activeTab === 'users' && (
+        {isLoading && (
+          <div className="text-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+            <p className="text-gray-600">加载数据中...</p>
+          </div>
+        )}
+
+        {/* Analytics Tab */}
+        {activeTab === 'analytics' && analytics && !isLoading && (
+          <div className="space-y-6">
+            {/* Overview Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="bg-white rounded-lg p-6 shadow-sm border">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-blue-600">{analytics.overview.totalUsers}</div>
+                  <div className="text-sm text-gray-500">总用户数</div>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg p-6 shadow-sm border">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-green-600">{analytics.overview.totalVideos}</div>
+                  <div className="text-sm text-gray-500">视频数量</div>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg p-6 shadow-sm border">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-purple-600">{analytics.overview.activeSubscriptions}</div>
+                  <div className="text-sm text-gray-500">活跃订阅</div>
+                </div>
+              </div>
+              <div className="bg-white rounded-lg p-6 shadow-sm border">
+                <div className="text-center">
+                  <div className="text-3xl font-bold text-orange-600">¥{analytics.overview.totalRevenue}</div>
+                  <div className="text-sm text-gray-500">总收入</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* User Stats */}
+              <div className="bg-white rounded-lg p-6 shadow-sm border">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">用户角色分布</h3>
+                <div className="space-y-3">
+                  {analytics.userStats.byRole.map((item) => (
+                    <div key={item.role} className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">
+                        {item.role === 'STUDENT' ? '学生' : '管理员'}
+                      </span>
+                      <span className="text-sm font-medium">{item.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Video Stats */}
+              <div className="bg-white rounded-lg p-6 shadow-sm border">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">视频分类分布</h3>
+                <div className="space-y-3">
+                  {analytics.videoStats.byCategory.map((item) => (
+                    <div key={item.categoryName} className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">{item.categoryName}</span>
+                      <span className="text-sm font-medium">{item.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Top Videos */}
+            <div className="bg-white rounded-lg p-6 shadow-sm border">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">热门视频</h3>
+              <div className="overflow-x-auto">
+                <table className="min-w-full">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left py-2">视频标题</th>
+                      <th className="text-left py-2">观看次数</th>
+                      <th className="text-left py-2">平均进度</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {analytics.videoStats.topVideos.map((video, index) => (
+                      <tr key={index} className="border-b">
+                        <td className="py-2 text-sm">{video.title}</td>
+                        <td className="py-2 text-sm">{video.watchCount}</td>
+                        <td className="py-2 text-sm">{Math.round(video.avgProgress * 100)}%</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Users Tab */}
+        {activeTab === 'users' && !isLoading && (
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-gray-900">用户访问权限管理</h2>
+              <h2 className="text-lg font-semibold text-gray-900">用户管理</h2>
               <button
                 onClick={() => setShowAddUser(true)}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
@@ -236,7 +393,6 @@ export default function AdminPage() {
               </button>
             </div>
 
-            {/* Users Table */}
             <div className="bg-white shadow-sm rounded-lg overflow-hidden">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
@@ -245,13 +401,13 @@ export default function AdminPage() {
                       用户信息
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      IP地址
+                      角色
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      访问级别
+                      订阅状态
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      权限到期
+                      注册时间
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       操作
@@ -268,26 +424,28 @@ export default function AdminPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          {user.ipAddress}
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          user.role === 'ADMIN' ? 'bg-red-100 text-red-800' : 'bg-blue-100 text-blue-800'
+                        }`}>
+                          {user.role === 'ADMIN' ? '管理员' : '学生'}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          user.accessLevel === 'admin' ? 'bg-red-100 text-red-800' :
-                          user.accessLevel === 'premium' ? 'bg-green-100 text-green-800' :
-                          'bg-gray-100 text-gray-800'
-                        }`}>
-                          {user.accessLevel === 'admin' ? '管理员' :
-                           user.accessLevel === 'premium' ? '高级用户' : '基础用户'}
-                        </span>
+                        {user.subscription ? (
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">{user.subscription.planName}</div>
+                            <div className="text-sm text-gray-500">剩余 {user.subscription.daysRemaining} 天</div>
+                          </div>
+                        ) : (
+                          <span className="text-sm text-gray-500">无订阅</span>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {user.accessUntil}
+                        {formatDate(user.createdAt)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <button
-                          onClick={() => removeUser(user.id)}
+                          onClick={() => handleDeleteUser(user.id)}
                           className="text-red-600 hover:text-red-900"
                         >
                           删除
@@ -301,91 +459,66 @@ export default function AdminPage() {
           </div>
         )}
 
-        {activeTab === 'videos' && (
+        {/* Videos Tab */}
+        {activeTab === 'videos' && !isLoading && (
           <div>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-lg font-semibold text-gray-900">视频访问权限管理</h2>
+              <h2 className="text-lg font-semibold text-gray-900">视频管理</h2>
               <button
-                onClick={() => setShowAddVideo(true)}
+                onClick={() => router.push("/admin/video-management")}
                 className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
               >
-                添加视频
+                📺 详细管理
               </button>
             </div>
 
-            {/* Videos Grid */}
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {videos.map((video) => (
                 <div key={video.id} className="bg-white rounded-lg border p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-2">{video.title}</h3>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        允许的IP地址
-                      </label>
-                      <div className="flex flex-wrap gap-1">
-                        {video.allowedIPs.map((ip, index) => (
-                          <span key={index} className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                            {ip}
-                          </span>
-                        ))}
-                      </div>
+                  <p className="text-sm text-gray-600 mb-3 line-clamp-2">{video.description}</p>
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">分类:</span>
+                      <span>{video.category.displayName}</span>
                     </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        权限到期
-                      </label>
-                      <span className="text-sm text-gray-900">{video.expiresAt}</span>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">访问级别:</span>
+                      <span className={`px-2 py-1 rounded text-xs ${
+                        video.accessLevel === 'PREMIUM' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                      }`}>
+                        {video.accessLevel === 'PREMIUM' ? '高级' : '基础'}
+                      </span>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={video.allowDownload}
-                          onChange={(e) => updateVideoAccess(video.id, 'allowDownload', e.target.checked)}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">允许下载</span>
-                      </label>
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={video.allowScreenRecord}
-                          onChange={(e) => updateVideoAccess(video.id, 'allowScreenRecord', e.target.checked)}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">允许录屏</span>
-                      </label>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">状态:</span>
+                      <span className={`px-2 py-1 rounded text-xs ${
+                        video.status === 'ACTIVE' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {video.status === 'ACTIVE' ? '已激活' : '已停用'}
+                      </span>
                     </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">观看次数:</span>
+                      <span>{video.stats.watchCount}</span>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex gap-2">
                     <button
-                      onClick={() => removeVideo(video.id)}
-                      className="w-full bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 transition-colors"
+                      onClick={() => handleUpdateVideoStatus(video.id, video.status === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE')}
+                      className={`flex-1 px-3 py-2 rounded text-sm font-medium ${
+                        video.status === 'ACTIVE' 
+                          ? 'bg-gray-600 text-white hover:bg-gray-700' 
+                          : 'bg-green-600 text-white hover:bg-green-700'
+                      }`}
                     >
-                      删除视频
+                      {video.status === 'ACTIVE' ? '停用' : '激活'}
                     </button>
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'analytics' && (
-          <div className="bg-white rounded-lg border p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">访问统计</h2>
-            <div className="grid md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-blue-600">{users.length}</div>
-                <div className="text-sm text-gray-500">总用户数</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-600">{videos.length}</div>
-                <div className="text-sm text-gray-500">视频数量</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-600">98%</div>
-                <div className="text-sm text-gray-500">系统可用性</div>
-              </div>
             </div>
           </div>
         )}
@@ -416,35 +549,15 @@ export default function AdminPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">IP地址</label>
-                <input
-                  type="text"
-                  value={newUser.ipAddress}
-                  onChange={(e) => setNewUser({...newUser, ipAddress: e.target.value})}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="192.168.1.100"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">访问级别</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">角色</label>
                 <select
-                  value={newUser.accessLevel}
-                  onChange={(e) => setNewUser({...newUser, accessLevel: e.target.value as 'basic' | 'premium' | 'admin'})}
+                  value={newUser.role}
+                  onChange={(e) => setNewUser({...newUser, role: e.target.value})}
                   className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="basic">基础用户</option>
-                  <option value="premium">高级用户</option>
-                  <option value="admin">管理员</option>
+                  <option value="STUDENT">学生</option>
+                  <option value="ADMIN">管理员</option>
                 </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">权限到期</label>
-                <input
-                  type="date"
-                  value={newUser.accessUntil}
-                  onChange={(e) => setNewUser({...newUser, accessUntil: e.target.value})}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
               </div>
             </div>
             <div className="flex gap-3 mt-6">
@@ -456,69 +569,6 @@ export default function AdminPage() {
               </button>
               <button
                 onClick={() => setShowAddUser(false)}
-                className="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
-              >
-                取消
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Add Video Modal */}
-      {showAddVideo && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">添加新视频</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">视频标题</label>
-                <input
-                  type="text"
-                  value={newVideo.title}
-                  onChange={(e) => setNewVideo({...newVideo, title: e.target.value})}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">权限到期</label>
-                <input
-                  type="date"
-                  value={newVideo.expiresAt}
-                  onChange={(e) => setNewVideo({...newVideo, expiresAt: e.target.value})}
-                  className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div className="flex items-center gap-4">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={newVideo.allowDownload}
-                    onChange={(e) => setNewVideo({...newVideo, allowDownload: e.target.checked})}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">允许下载</span>
-                </label>
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={newVideo.allowScreenRecord}
-                    onChange={(e) => setNewVideo({...newVideo, allowScreenRecord: e.target.checked})}
-                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">允许录屏</span>
-                </label>
-              </div>
-            </div>
-            <div className="flex gap-3 mt-6">
-              <button
-                onClick={handleAddVideo}
-                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                添加视频
-              </button>
-              <button
-                onClick={() => setShowAddVideo(false)}
                 className="flex-1 bg-gray-300 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-400 transition-colors"
               >
                 取消

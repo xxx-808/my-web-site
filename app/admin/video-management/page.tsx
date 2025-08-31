@@ -1,29 +1,44 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface Video {
   id: string;
   title: string;
   description: string;
-  category: "writing" | "speaking" | "reading" | "listening";
+  category: {
+    id: string;
+    name: string;
+    displayName: string;
+  };
   duration: string;
   filePath: string;
   thumbnail: string;
   uploadDate: string;
-  status: "active" | "inactive" | "processing";
-  accessLevel: "basic" | "premium";
+  status: "ACTIVE" | "INACTIVE" | "PROCESSING";
+  accessLevel: "BASIC" | "PREMIUM";
   tags: string[];
   cognitiveObjectives: string[];
+  stats: {
+    accessCount: number;
+    watchCount: number;
+    averageProgress: number;
+  };
+}
+
+interface VideoCategory {
+  id: string;
+  name: string;
+  displayName: string;
 }
 
 // Explicit type for newVideo form state to avoid literal narrowing
 type NewVideo = {
   title: string;
   description: string;
-  category: "writing" | "speaking" | "reading" | "listening";
-  accessLevel: "basic" | "premium";
+  categoryId: string;
+  accessLevel: "BASIC" | "PREMIUM";
   tags: string[];
   cognitiveObjectives: string[];
 };
@@ -34,49 +49,84 @@ export default function VideoManagementPage() {
   const [activeTab, setActiveTab] = useState<'upload' | 'manage' | 'batch'>('upload');
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   
-  // 模拟视频数据
-  const [videos, setVideos] = useState<Video[]>([
-    {
-      id: "video_001",
-      title: "雅思写作Task 1: 图表描述认知策略",
-      description: "基于认知科学的图表描述方法，解决中国学生常见表达障碍",
-      category: "writing",
-      duration: "45:30",
-      filePath: "/videos/writing-task1.mp4",
-      thumbnail: "https://picsum.photos/id/1011/400/225",
-      uploadDate: "2024-08-19",
-      status: "active",
-      accessLevel: "premium",
-      tags: ["写作", "Task1", "图表描述", "认知策略"],
-      cognitiveObjectives: ["提高图表分析能力", "培养逻辑表达思维", "减少母语负迁移"]
-    },
-    {
-      id: "video_002",
-      title: "雅思口语Part 2: 话题展开策略训练",
-      description: "运用认知语言学理论，培养话题深度展开能力",
-      category: "speaking",
-      duration: "52:15",
-      filePath: "/videos/speaking-part2.mp4",
-      thumbnail: "https://picsum.photos/id/1005/400/225",
-      uploadDate: "2024-08-18",
-      status: "active",
-      accessLevel: "premium",
-      tags: ["口语", "Part2", "话题展开", "认知语言学"],
-      cognitiveObjectives: ["提升话题延展能力", "培养思维连贯性", "增强表达自信"]
-    }
-  ]);
+  // 数据状态
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [categories, setCategories] = useState<VideoCategory[]>([]);
+  const [selectedVideos, setSelectedVideos] = useState<string[]>([]);
 
   const [newVideo, setNewVideo] = useState<NewVideo>({
     title: "",
     description: "",
-    category: "writing",
-    accessLevel: "basic",
+    categoryId: "",
+    accessLevel: "BASIC",
     tags: [] as string[],
     cognitiveObjectives: [] as string[]
   });
 
-  const [selectedVideos, setSelectedVideos] = useState<string[]>([]);
+  useEffect(() => {
+    checkAuthentication();
+  }, []);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      loadData();
+    }
+  }, [isAuthenticated]);
+
+  const checkAuthentication = () => {
+    try {
+      const raw = localStorage.getItem("tc_auth");
+      if (raw) {
+        const parsed = JSON.parse(raw) as { role: string; id: string };
+        if (parsed.role === "ADMIN") {
+          setIsAuthenticated(true);
+        } else {
+          router.push("/admin-login");
+        }
+      } else {
+        router.push("/admin-login");
+      }
+    } catch {
+      router.push("/admin-login");
+    }
+  };
+
+  const loadData = async () => {
+    setIsLoading(true);
+    try {
+      // 并行加载视频和分类数据
+      const [videosResponse, categoriesResponse] = await Promise.all([
+        fetch('/api/admin/videos'),
+        fetch('/api/admin/categories')
+      ]);
+
+      if (videosResponse.ok) {
+        const videosData = await videosResponse.json();
+        setVideos(videosData.videos);
+      }
+
+      // 如果没有分类API，使用默认分类
+      if (categoriesResponse.ok) {
+        const categoriesData = await categoriesResponse.json();
+        setCategories(categoriesData.categories);
+      } else {
+        // 使用默认分类
+        setCategories([
+          { id: "writing", name: "writing", displayName: "写作技能" },
+          { id: "speaking", name: "speaking", displayName: "口语表达" },
+          { id: "reading", name: "reading", displayName: "阅读策略" },
+          { id: "listening", name: "listening", displayName: "听力技巧" }
+        ]);
+      }
+    } catch (error) {
+      console.error('Failed to load data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // 文件上传处理
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -109,59 +159,74 @@ export default function VideoManagementPage() {
   };
 
   // 添加新视频
-  const handleAddVideo = () => {
-    if (!newVideo.title || !newVideo.description) {
+  const handleAddVideo = async () => {
+    if (!newVideo.title || !newVideo.description || !newVideo.categoryId) {
       alert("请填写完整信息");
       return;
     }
 
-    const video: Video = {
-      id: `video_${Date.now()}`,
-      ...newVideo,
-      duration: "00:00",
-      filePath: "",
-      thumbnail: "https://picsum.photos/id/1000/400/225",
-      uploadDate: new Date().toISOString().split('T')[0],
-      status: "processing",
-      tags: newVideo.tags,
-      cognitiveObjectives: newVideo.cognitiveObjectives
-    };
+    try {
+      const response = await fetch('/api/admin/videos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newVideo),
+      });
 
-    setVideos([...videos, video]);
-    setNewVideo({
-      title: "",
-      description: "",
-      category: "writing",
-      accessLevel: "basic",
-      tags: [],
-      cognitiveObjectives: []
-    });
+      if (response.ok) {
+        alert("视频创建成功");
+        setNewVideo({
+          title: "",
+          description: "",
+          categoryId: "",
+          accessLevel: "BASIC",
+          tags: [],
+          cognitiveObjectives: []
+        });
+        loadData(); // 重新加载数据
+      } else {
+        const error = await response.json();
+        alert(error.error || "创建失败");
+      }
+    } catch (error) {
+      console.error('Failed to create video:', error);
+      alert("创建失败");
+    }
   };
 
   // 批量操作
-  const handleBatchOperation = (operation: string) => {
+  const handleBatchOperation = async (operation: string) => {
     if (selectedVideos.length === 0) {
       alert("请先选择视频");
       return;
     }
 
-    switch (operation) {
-      case "activate":
-        setVideos(videos.map(v => 
-          selectedVideos.includes(v.id) ? { ...v, status: "active" } : v
-        ));
-        break;
-      case "deactivate":
-        setVideos(videos.map(v => 
-          selectedVideos.includes(v.id) ? { ...v, status: "inactive" } : v
-        ));
-        break;
-      case "delete":
-        if (confirm(`确定要删除选中的 ${selectedVideos.length} 个视频吗？`)) {
-          setVideos(videos.filter(v => !selectedVideos.includes(v.id)));
-          setSelectedVideos([]);
+    if (operation === "delete" && !confirm(`确定要删除选中的 ${selectedVideos.length} 个视频吗？`)) {
+      return;
+    }
+
+    try {
+      const promises = selectedVideos.map(async (videoId) => {
+        if (operation === "delete") {
+          return fetch(`/api/admin/videos/${videoId}`, { method: 'DELETE' });
+        } else {
+          const status = operation === "activate" ? "ACTIVE" : "INACTIVE";
+          return fetch(`/api/admin/videos/${videoId}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status })
+          });
         }
-        break;
+      });
+
+      await Promise.all(promises);
+      alert("批量操作完成");
+      setSelectedVideos([]);
+      loadData();
+    } catch (error) {
+      console.error('Batch operation failed:', error);
+      alert("批量操作失败");
     }
   };
 
@@ -173,6 +238,17 @@ export default function VideoManagementPage() {
       setSelectedVideos(videos.map(v => v.id));
     }
   };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">验证管理员权限...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -302,14 +378,16 @@ export default function VideoManagementPage() {
                         技能分类
                       </label>
                       <select
-                        value={newVideo.category}
-                        onChange={(e) => setNewVideo({...newVideo, category: e.target.value as 'writing' | 'speaking' | 'reading' | 'listening'})}
+                        value={newVideo.categoryId}
+                        onChange={(e) => setNewVideo({...newVideo, categoryId: e.target.value})}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                       >
-                        <option value="writing">写作技能</option>
-                        <option value="speaking">口语表达</option>
-                        <option value="reading">阅读策略</option>
-                        <option value="listening">听力技巧</option>
+                        <option value="">请选择分类</option>
+                        {categories.map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.displayName}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     
@@ -319,11 +397,11 @@ export default function VideoManagementPage() {
                       </label>
                       <select
                         value={newVideo.accessLevel}
-                        onChange={(e) => setNewVideo({...newVideo, accessLevel: e.target.value as 'basic' | 'premium'})}
+                        onChange={(e) => setNewVideo({...newVideo, accessLevel: e.target.value as 'BASIC' | 'PREMIUM'})}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500"
                       >
-                        <option value="basic">基础会员</option>
-                        <option value="premium">高级会员</option>
+                        <option value="BASIC">基础会员</option>
+                        <option value="PREMIUM">高级会员</option>
                       </select>
                     </div>
                   </div>
@@ -416,31 +494,29 @@ export default function VideoManagementPage() {
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          video.category === 'writing' ? 'bg-blue-100 text-blue-800' :
-                          video.category === 'speaking' ? 'bg-green-100 text-green-800' :
-                          video.category === 'reading' ? 'bg-purple-100 text-purple-800' :
+                          video.category.name === 'writing' ? 'bg-blue-100 text-blue-800' :
+                          video.category.name === 'speaking' ? 'bg-green-100 text-green-800' :
+                          video.category.name === 'reading' ? 'bg-purple-100 text-purple-800' :
                           'bg-orange-100 text-orange-800'
                         }`}>
-                          {video.category === 'writing' ? '写作' :
-                           video.category === 'speaking' ? '口语' :
-                           video.category === 'reading' ? '阅读' : '听力'}
+                          {video.category.displayName}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          video.status === 'active' ? 'bg-green-100 text-green-800' :
-                          video.status === 'inactive' ? 'bg-red-100 text-red-800' :
+                          video.status === 'ACTIVE' ? 'bg-green-100 text-green-800' :
+                          video.status === 'INACTIVE' ? 'bg-red-100 text-red-800' :
                           'bg-yellow-100 text-yellow-800'
                         }`}>
-                          {video.status === 'active' ? '已激活' :
-                           video.status === 'inactive' ? '已停用' : '处理中'}
+                          {video.status === 'ACTIVE' ? '已激活' :
+                           video.status === 'INACTIVE' ? '已停用' : '处理中'}
                         </span>
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          video.accessLevel === 'premium' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
+                          video.accessLevel === 'PREMIUM' ? 'bg-purple-100 text-purple-800' : 'bg-blue-100 text-blue-800'
                         }`}>
-                          {video.accessLevel === 'premium' ? '高级' : '基础'}
+                          {video.accessLevel === 'PREMIUM' ? '高级' : '基础'}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-500">
@@ -534,7 +610,7 @@ export default function VideoManagementPage() {
                     />
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium text-gray-900 truncate">{video.title}</div>
-                      <div className="text-xs text-gray-500">{video.category}</div>
+                      <div className="text-xs text-gray-500">{video.category.displayName}</div>
                     </div>
                   </div>
                 </div>
