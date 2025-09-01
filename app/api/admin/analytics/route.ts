@@ -30,7 +30,7 @@ export async function GET() {
       totalVideos,
       totalSubscriptions,
       activeSubscriptions,
-      totalWatchTime,
+      totalWatchRecords,
       usersByRole,
       videosByCategory,
       subscriptionsByPlan,
@@ -56,12 +56,8 @@ export async function GET() {
         }
       }),
       
-      // 总观看时长
-      prisma.watchHistory.aggregate({
-        _sum: {
-          watchTime: true
-        }
-      }),
+      // 总观看记录数
+      prisma.watchHistory.count(),
       
       // 按角色分组的用户
       prisma.user.groupBy({
@@ -93,7 +89,7 @@ export async function GET() {
       // 最近活动（最近7天的观看记录）
       prisma.watchHistory.findMany({
         where: {
-          lastWatched: {
+          watchedAt: {
             gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
           }
         },
@@ -112,7 +108,7 @@ export async function GET() {
           }
         },
         orderBy: {
-          lastWatched: 'desc'
+          watchedAt: 'desc'
         },
         take: 20
       }),
@@ -121,10 +117,9 @@ export async function GET() {
       prisma.video.findMany({
         include: {
           category: true,
-          watchHistory: {
+          watchHistories: {
             select: {
               id: true,
-              watchTime: true,
               progress: true
             }
           }
@@ -166,7 +161,7 @@ export async function GET() {
       const category = videoCategories.find(cat => cat.id === item.categoryId);
       return {
         categoryId: item.categoryId,
-        categoryName: category?.displayName || 'Unknown',
+        categoryName: category?.name || 'Unknown',
         count: item._count.id
       };
     });
@@ -184,20 +179,20 @@ export async function GET() {
 
     // 处理热门视频统计
     const topVideosWithStats = topVideos.map(video => {
-      const watchCount = video.watchHistory.length;
-      const totalWatchTime = video.watchHistory.reduce((sum, h) => sum + h.watchTime, 0);
+      const watchCount = video.watchHistories.length;
+      const totalWatchTime = video.watchHistories.length; // 使用观看次数代替观看时长
       const avgProgress = watchCount > 0 
-        ? video.watchHistory.reduce((sum, h) => sum + h.progress, 0) / watchCount 
+        ? video.watchHistories.reduce((sum, h) => sum + h.progress, 0) / watchCount 
         : 0;
       
       return {
         id: video.id,
         title: video.title,
-        category: video.category.displayName,
+        category: video.category.name,
         watchCount,
         totalWatchTime,
         avgProgress: Math.round(avgProgress * 100) / 100,
-        completionRate: video.watchHistory.filter(h => h.progress >= 0.9).length / Math.max(watchCount, 1)
+        completionRate: video.watchHistories.filter(h => h.progress >= 0.9).length / Math.max(watchCount, 1)
       };
     }).sort((a, b) => b.watchCount - a.watchCount);
 
@@ -235,7 +230,7 @@ export async function GET() {
           }),
           prisma.watchHistory.count({
             where: {
-              lastWatched: {
+              watchedAt: {
                 gte: startOfDay,
                 lte: endOfDay
               }
@@ -266,7 +261,7 @@ export async function GET() {
         totalVideos,
         totalSubscriptions,
         activeSubscriptions,
-        totalWatchTime: totalWatchTime._sum.watchTime || 0,
+        totalWatchRecords: totalWatchRecords,
         newUsersLast30Days: userStats,
         totalRevenue,
         conversionRate: totalUsers > 0 ? (activeSubscriptions / totalUsers) * 100 : 0
@@ -305,9 +300,8 @@ export async function GET() {
           id: activity.id,
           user: activity.user,
           video: activity.video,
-          watchTime: activity.watchTime,
           progress: activity.progress,
-          lastWatched: activity.lastWatched
+          watchedAt: activity.watchedAt
         })),
         dailyTrends: dailyStats
       }

@@ -72,10 +72,6 @@ export async function GET(request: NextRequest) {
         where,
         include: {
           subscriptions: {
-            where: {
-              status: 'ACTIVE',
-              endDate: { gte: new Date() }
-            },
             include: {
               plan: true
             }
@@ -90,10 +86,10 @@ export async function GET(request: NextRequest) {
               }
             }
           },
-          watchHistory: {
+          watchHistories: {
             take: 1,
             orderBy: {
-              lastWatched: 'desc'
+              watchedAt: 'desc'
             }
           }
         },
@@ -109,29 +105,7 @@ export async function GET(request: NextRequest) {
     console.log(`✅ 成功获取 ${users.length} 个用户，总计 ${totalCount} 个`);
 
     // 处理用户数据
-    const processedUsers = users.map((user: {
-      id: string;
-      name: string;
-      email: string;
-      role: string;
-      createdAt: Date;
-      updatedAt: Date;
-      subscriptions: Array<{
-        id: string;
-        plan: { name: string; description: string };
-        startDate: Date;
-        endDate: Date;
-        status: string;
-      }>;
-      videoAccesses: Array<{
-        id: string;
-        video: {
-          id: string;
-          title: string;
-        };
-      }>;
-      watchHistory: Array<{ lastWatched: Date }>;
-    }) => ({
+    const processedUsers = users.map((user: any) => ({
       id: user.id,
       name: user.name,
       email: user.email,
@@ -151,7 +125,7 @@ export async function GET(request: NextRequest) {
       // 统计信息
       stats: {
         videoAccessCount: user.videoAccesses.length,
-        lastActivity: user.watchHistory[0]?.lastWatched || null
+        lastActivity: user.watchHistory[0]?.watchedAt || null
       }
     }));
 
@@ -202,12 +176,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, email, role, subscriptionPlanId } = body;
+    const { name, email, role, password, subscriptionPlanId } = body;
 
     // 验证必填字段
-    if (!name || !email || !role) {
+    if (!name || !email || !role || !password) {
       return NextResponse.json({ 
-        error: 'Name, email, and role are required' 
+        error: 'Name, email, role, and password are required' 
       }, { status: 400 });
     }
 
@@ -227,6 +201,7 @@ export async function POST(request: NextRequest) {
       data: {
         name,
         email,
+        password,
         role: role.toUpperCase()
       }
     });

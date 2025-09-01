@@ -36,9 +36,6 @@ export async function GET(
         subscriptions: {
           include: {
             plan: true
-          },
-          orderBy: {
-            createdAt: 'desc'
           }
         },
         videoAccesses: {
@@ -50,7 +47,7 @@ export async function GET(
             }
           }
         },
-        watchHistory: {
+        watchHistories: {
           include: {
             video: {
               include: {
@@ -59,7 +56,7 @@ export async function GET(
             }
           },
           orderBy: {
-            lastWatched: 'desc'
+            watchedAt: 'desc'
           },
           take: 20
         }
@@ -81,46 +78,45 @@ export async function GET(
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       
-      // 订阅历史
-      subscriptions: user.subscriptions.map(sub => ({
-        id: sub.id,
-        planName: sub.plan.name,
-        planDescription: sub.plan.description,
-        startDate: sub.startDate,
-        endDate: sub.endDate,
-        status: sub.status,
-        createdAt: sub.createdAt
-      })),
+      // 订阅信息
+      subscription: user.subscriptions[0] ? {
+        id: user.subscriptions[0].id,
+        planName: user.subscriptions[0].plan.name,
+        planDescription: user.subscriptions[0].plan.description,
+        startDate: user.subscriptions[0].startDate,
+        endDate: user.subscriptions[0].endDate,
+        status: user.subscriptions[0].status,
+        createdAt: user.subscriptions[0].createdAt
+      } : null,
 
       // 视频访问权限
       videoAccesses: user.videoAccesses.map(access => ({
         id: access.id,
         videoId: access.video.id,
         videoTitle: access.video.title,
-        category: access.video.category.displayName,
+        category: access.video.category.name,
         accessType: access.accessType,
         grantedAt: access.grantedAt,
         expiresAt: access.expiresAt,
-        isActive: access.isActive
+        isActive: !access.expiresAt || access.expiresAt > new Date()
       })),
 
       // 观看历史
-      watchHistory: user.watchHistory.map(history => ({
+      watchHistories: user.watchHistories.map(history => ({
         id: history.id,
         videoId: history.video.id,
         videoTitle: history.video.title,
-        category: history.video.category.displayName,
-        watchTime: history.watchTime,
+        category: history.video.category.name,
         progress: history.progress,
-        lastWatched: history.lastWatched
+        watchedAt: history.watchedAt
       })),
 
       // 统计信息
       stats: {
         totalVideoAccess: user.videoAccesses.length,
-        totalWatchTime: user.watchHistory.reduce((total, history) => total + history.watchTime, 0),
-        averageProgress: user.watchHistory.length > 0 
-          ? user.watchHistory.reduce((total, history) => total + history.progress, 0) / user.watchHistory.length 
+        totalWatchRecords: user.watchHistories.length,
+        averageProgress: user.watchHistories.length > 0 
+          ? user.watchHistories.reduce((total, history) => total + history.progress, 0) / user.watchHistories.length 
           : 0,
         categoriesAccessed: [...new Set(user.videoAccesses.map(access => access.video.category.name))].length
       }

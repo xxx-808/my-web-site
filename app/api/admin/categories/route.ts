@@ -27,9 +27,6 @@ export async function GET() {
 
     // 获取所有分类
     const categories = await prisma.videoCategory.findMany({
-      where: {
-        isActive: true
-      },
       orderBy: {
         name: 'asc'
       }
@@ -70,12 +67,12 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { name, displayName, description, icon } = body;
+    const { name, description } = body;
 
     // 验证必填字段
-    if (!name || !displayName) {
+    if (!name) {
       return NextResponse.json({ 
-        error: 'Name and display name are required' 
+        error: 'Name is required' 
       }, { status: 400 });
     }
 
@@ -94,9 +91,7 @@ export async function POST(request: NextRequest) {
     const newCategory = await prisma.videoCategory.create({
       data: {
         name,
-        displayName,
-        description: description || '',
-        icon: icon || '📚'
+        description: description || ''
       }
     });
 

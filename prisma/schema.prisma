@@ -20,7 +20,7 @@ model User {
   updatedAt DateTime @updatedAt
 
   // Relations
-  subscription    Subscription?
+  subscriptions   Subscription[]
   videoAccesses   VideoAccess[]
   watchHistories  WatchHistory[]
 
@@ -45,7 +45,7 @@ model SubscriptionPlan {
 
 model Subscription {
   id        String   @id @default(cuid())
-  userId    String   @unique // One-to-one relation
+  userId    String
   planId    String
   status    String   @default("ACTIVE") // "ACTIVE", "EXPIRED", "CANCELLED"
   startDate DateTime @default(now())
