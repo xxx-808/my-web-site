@@ -79,8 +79,8 @@ export async function GET(request: NextRequest) {
          (video.accessLevel === 'PREMIUM' && userSubscription.plan.name === 'premium'));
       
       const canAccess = hasDirectAccess || hasSubscriptionAccess;
-      const watchProgress = video.watchHistory[0]?.progress || 0;
-      const lastWatched = video.watchHistory[0]?.lastWatched;
+             const watchProgress = video.watchHistories[0]?.progress || 0;
+       const lastWatched = video.watchHistories[0]?.watchedAt;
 
       return {
         id: video.id,
@@ -95,8 +95,8 @@ export async function GET(request: NextRequest) {
         cognitiveObjectives: video.cognitiveObjectives,
         uploadDate: video.uploadDate,
         canAccess,
-        watchProgress,
-        lastWatched,
+                 watchProgress,
+         lastWatched: lastWatched,
         // 访问权限详情
         accessInfo: {
           hasDirectAccess,
