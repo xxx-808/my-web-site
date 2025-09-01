@@ -25,27 +25,19 @@ async function main() {
   const categories = [
     {
       name: 'writing',
-      displayName: '写作技能',
-      description: '雅思写作相关课程',
-      icon: '✍️'
+      description: '雅思写作相关课程'
     },
     {
       name: 'speaking',
-      displayName: '口语表达',
-      description: '雅思口语相关课程',
-      icon: '🗣️'
+      description: '雅思口语相关课程'
     },
     {
       name: 'reading',
-      displayName: '阅读策略',
-      description: '雅思阅读相关课程',
-      icon: '📖'
+      description: '雅思阅读相关课程'
     },
     {
       name: 'listening',
-      displayName: '听力技巧',
-      description: '雅思听力相关课程',
-      icon: '👂'
+      description: '雅思听力相关课程'
     }
   ]
 
@@ -61,17 +53,15 @@ async function main() {
   const plans = [
     {
       name: 'basic',
-      description: '基础会员计划',
+      description: '基础会员计划 - 每周2次直播小班课，作业批改与要点讲义，课程回放与练习题库',
       price: 299.0,
-      duration: 30,
-      features: ['每周2次直播小班课', '作业批改与要点讲义', '课程回放与练习题库']
+      duration: 30
     },
     {
       name: 'premium',
-      description: '高级会员计划',
+      description: '高级会员计划 - 每周3次直播与口语演练房，导师精批（写作/演讲各2次/月），学术术语速记包与检索工作坊',
       price: 799.0,
-      duration: 90,
-      features: ['每周3次直播与口语演练房', '导师精批（写作/演讲各2次/月）', '学术术语速记包与检索工作坊']
+      duration: 90
     }
   ]
 
@@ -88,11 +78,13 @@ async function main() {
     {
       email: 'student@example.com',
       name: '张同学',
+      password: 'password123',
       role: 'STUDENT' as const
     },
     {
       email: 'admin@tiffanyscollege.com',
       name: '管理员',
+      password: 'admin123',
       role: 'ADMIN' as const
     }
   ]
