@@ -105,7 +105,7 @@ export async function GET(request: NextRequest) {
     console.log(`✅ 成功获取 ${users.length} 个用户，总计 ${totalCount} 个`);
 
     // 处理用户数据
-    const processedUsers = users.map((user: any) => ({
+    const processedUsers = users.map((user) => ({
       id: user.id,
       name: user.name,
       email: user.email,
@@ -125,7 +125,7 @@ export async function GET(request: NextRequest) {
       // 统计信息
       stats: {
         videoAccessCount: user.videoAccesses.length,
-        lastActivity: user.watchHistory[0]?.watchedAt || null
+        lastActivity: user.watchHistories[0]?.watchedAt || null
       }
     }));
 
