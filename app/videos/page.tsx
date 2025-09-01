@@ -171,9 +171,9 @@ export default function VideosPage() {
     
     // 检查访问权限
     if (!selectedVideo.canAccess) {
-      if (selectedVideo.accessLevel === "pro" && plan !== "pro") {
-        alert("此视频为 Pro 会员专享。请升级到 Pro 后观看。");
-        return;
+    if (selectedVideo.accessLevel === "pro" && plan !== "pro") {
+      alert("此视频为 Pro 会员专享。请升级到 Pro 后观看。");
+      return;
       } else {
         alert("您没有访问此视频的权限。请联系管理员。");
         return;
@@ -333,17 +333,17 @@ export default function VideosPage() {
                                         ></div>
                                       </div>
                                       <span className="text-xs text-gray-500">{video.watchProgress}%</span>
-                                    </div>
+                      </div>
                                   )}
-                                </div>
+                    </div>
                                 {!video.canAccess && (
                                   <div className="mt-2">
                                     <span className="text-xs text-red-600 font-medium">
                                       {video.accessLevel === "pro" ? "需要 Pro 套餐" : "无访问权限"}
                                     </span>
-                                  </div>
+                      </div>
                                 )}
-                              </div>
+                      </div>
                             </div>
                           </div>
                         ))
@@ -358,7 +358,7 @@ export default function VideosPage() {
           {/* Video Player */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-sm border overflow-hidden sticky top-8">
-              {selectedVideo ? (
+            {selectedVideo ? (
                 <>
                   <div className="aspect-video bg-black relative">
                     <video
@@ -368,9 +368,9 @@ export default function VideosPage() {
                       onTimeUpdate={handleTimeUpdate}
                       onLoadedMetadata={handleLoadedMetadata}
                     >
-                      <source src={`/api/video/${selectedVideo.id}`} type="video/mp4" />
-                      您的浏览器不支持视频播放。
-                    </video>
+                    <source src={`/api/video/${selectedVideo.id}`} type="video/mp4" />
+                    您的浏览器不支持视频播放。
+                  </video>
                     
                     {/* Play Button Overlay */}
                     {!isPlaying && (
@@ -447,7 +447,7 @@ export default function VideosPage() {
                       <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
                         <span>分类: {selectedVideo.categoryDisplayName}</span>
                         <span>时长: {selectedVideo.duration}</span>
-                      </div>
+                    </div>
                       <div className="flex items-center justify-between text-xs text-gray-500">
                         <span>上传: {new Date(selectedVideo.uploadedAt).toLocaleDateString()}</span>
                         <span className={`px-2 py-1 rounded-full ${
@@ -457,9 +457,9 @@ export default function VideosPage() {
                         }`}>
                           {selectedVideo.accessLevel === "pro" ? "Pro" : "Basic"}
                         </span>
-                      </div>
-                    </div>
                   </div>
+                </div>
+              </div>
                 </>
               ) : (
                 <div className="aspect-video bg-gray-100 flex items-center justify-center">
@@ -468,9 +468,9 @@ export default function VideosPage() {
                     <p>选择一个视频开始观看</p>
                   </div>
                 </div>
-              )}
-            </div>
+            )}
           </div>
+      </div>
         </div>
       </main>
 

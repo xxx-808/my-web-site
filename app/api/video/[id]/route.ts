@@ -87,17 +87,17 @@ export async function GET(
     // 记录观看历史
     try {
       // 查找现有观看历史
-      let watchHistory = await prisma.watchHistory.findFirst({
+      const existingWatchHistory = await prisma.watchHistory.findFirst({
         where: {
           userId: userId,
           videoId: video.id
         }
       });
 
-      if (watchHistory) {
+      if (existingWatchHistory) {
         // 更新现有记录
         await prisma.watchHistory.update({
-          where: { id: watchHistory.id },
+          where: { id: existingWatchHistory.id },
           data: {
             watchedAt: new Date()
           }

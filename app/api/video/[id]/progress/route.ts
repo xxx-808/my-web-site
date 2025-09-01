@@ -11,13 +11,13 @@ export async function POST(
     const { id: videoId } = await context.params;
     const session = await getServerSession(authOptions);
     
-    if (!session?.user?.id) {
+    if (!session?.user?.userId) {
       return NextResponse.json({ 
         error: 'Authentication required' 
       }, { status: 401 });
     }
 
-    const userId = session.user.id as string;
+    const userId = session.user.userId as string;
     const body = await request.json();
     const { progress } = body;
 
@@ -35,17 +35,18 @@ export async function POST(
     }
 
     // 查找现有观看历史
-    let watchHistory = await prisma.watchHistory.findFirst({
+    const existingWatchHistory = await prisma.watchHistory.findFirst({
       where: {
         userId: userId,
         videoId: videoId
       }
     });
 
-    if (watchHistory) {
+    let watchHistory;
+    if (existingWatchHistory) {
       // 更新现有记录
       watchHistory = await prisma.watchHistory.update({
-        where: { id: watchHistory.id },
+        where: { id: existingWatchHistory.id },
         data: {
           progress: progress,
           watchedAt: new Date()
@@ -89,13 +90,13 @@ export async function GET(
     const { id: videoId } = await context.params;
     const session = await getServerSession(authOptions);
     
-    if (!session?.user?.id) {
+    if (!session?.user?.userId) {
       return NextResponse.json({ 
         error: 'Authentication required' 
       }, { status: 401 });
     }
 
-    const userId = session.user.id as string;
+    const userId = session.user.userId as string;
 
     // 获取观看历史
     const watchHistory = await prisma.watchHistory.findFirst({
