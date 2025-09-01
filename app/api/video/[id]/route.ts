@@ -80,9 +80,9 @@ export async function GET(
     }
 
     // 获取客户端IP地址（保留用于日志记录）
-    const _clientIP = request.headers.get('x-forwarded-for') || 
-                     request.headers.get('x-real-ip') || 
-                     '127.0.0.1';
+    // const _clientIP = request.headers.get('x-forwarded-for') || 
+    //                  request.headers.get('x-real-ip') || 
+    //                  '127.0.0.1';
 
     // 记录观看历史
     try {

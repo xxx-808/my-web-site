@@ -21,6 +21,15 @@ export default function AdminLoginPage() {
   const router = useRouter();
 
   // 恢复登录状态（本地存储）
+  // 模拟管理员数据
+  const mockAdmin: Admin = {
+    id: "admin_001",
+    name: "管理员",
+    email: "admin@tiffanyscollege.com",
+    role: "超级管理员",
+    permissions: ["用户管理", "视频管理"],
+  };
+
   useEffect(() => {
     try {
       const raw = localStorage.getItem("tc_auth");
@@ -32,16 +41,7 @@ export default function AdminLoginPage() {
         }
       }
     } catch {}
-  }, []);
-
-  // 模拟管理员数据
-  const mockAdmin: Admin = {
-    id: "admin_001",
-    name: "管理员",
-    email: "admin@tiffanyscollege.com",
-    role: "超级管理员",
-    permissions: ["用户管理", "视频管理"],
-  };
+  }, [mockAdmin]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface Video {
   id: string;
@@ -548,10 +549,12 @@ export default function VideoManagementPage() {
                         <tr key={video.id}>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center">
-                              <img
+                              <Image
                                 className="h-12 w-20 object-cover rounded"
                                 src={video.thumbnail}
                                 alt={video.title}
+                                width={80}
+                                height={48}
                               />
                               <div className="ml-4">
                                 <div className="text-sm font-medium text-gray-900">
