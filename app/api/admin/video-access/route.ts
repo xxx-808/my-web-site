@@ -83,7 +83,7 @@ export async function GET(request: NextRequest) {
       accessType: access.accessType,
       grantedAt: access.grantedAt,
       expiresAt: access.expiresAt,
-      isActive: access.isActive
+      isActive: !access.expiresAt || access.expiresAt > new Date()
     }));
 
     return NextResponse.json({
@@ -169,12 +169,10 @@ export async function POST(request: NextRequest) {
       // 更新现有访问权限
       const updatedAccess = await prisma.videoAccess.update({
         where: { id: existingAccess.id },
-        data: {
-          accessType: accessType.toUpperCase(),
-          expiresAt: expiresAt ? new Date(expiresAt) : null,
-          isActive: true,
-          updatedAt: new Date()
-        },
+                 data: {
+           accessType: accessType.toUpperCase(),
+           expiresAt: expiresAt ? new Date(expiresAt) : null
+         },
         include: {
           user: {
             select: {
@@ -202,22 +200,21 @@ export async function POST(request: NextRequest) {
           videoId: updatedAccess.video.id,
           videoTitle: updatedAccess.video.title,
           accessType: updatedAccess.accessType,
-          grantedAt: updatedAccess.grantedAt,
-          expiresAt: updatedAccess.expiresAt,
-          isActive: updatedAccess.isActive
+                     grantedAt: updatedAccess.grantedAt,
+           expiresAt: updatedAccess.expiresAt,
+           isActive: !updatedAccess.expiresAt || updatedAccess.expiresAt > new Date()
         }
       });
     } else {
       // 创建新的访问权限
       const newAccess = await prisma.videoAccess.create({
-        data: {
-          userId,
-          videoId,
-          accessType: accessType.toUpperCase(),
-          grantedAt: new Date(),
-          expiresAt: expiresAt ? new Date(expiresAt) : null,
-          isActive: true
-        },
+                 data: {
+           userId,
+           videoId,
+           accessType: accessType.toUpperCase(),
+           grantedAt: new Date(),
+           expiresAt: expiresAt ? new Date(expiresAt) : null
+         },
         include: {
           user: {
             select: {
@@ -245,9 +242,9 @@ export async function POST(request: NextRequest) {
           videoId: newAccess.video.id,
           videoTitle: newAccess.video.title,
           accessType: newAccess.accessType,
-          grantedAt: newAccess.grantedAt,
-          expiresAt: newAccess.expiresAt,
-          isActive: newAccess.isActive
+                     grantedAt: newAccess.grantedAt,
+           expiresAt: newAccess.expiresAt,
+           isActive: !newAccess.expiresAt || newAccess.expiresAt > new Date()
         }
       });
     }

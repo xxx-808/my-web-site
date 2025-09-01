@@ -46,7 +46,7 @@ export async function GET(
             }
           }
         },
-        watchHistory: {
+        watchHistories: {
           include: {
             user: {
               select: {
@@ -57,7 +57,7 @@ export async function GET(
             }
           },
           orderBy: {
-            lastWatched: 'desc'
+            watchedAt: 'desc'
           }
         }
       }
@@ -76,17 +76,13 @@ export async function GET(
       description: video.description,
       category: {
         id: video.category.id,
-        name: video.category.name,
-        displayName: video.category.displayName
+        name: video.category.name
       },
       duration: video.duration,
-      filePath: video.filePath,
+      url: video.url,
       thumbnail: video.thumbnail,
       accessLevel: video.accessLevel,
       status: video.status,
-      tags: video.tags,
-      cognitiveObjectives: video.cognitiveObjectives,
-      uploadDate: video.uploadDate,
       createdAt: video.createdAt,
       updatedAt: video.updatedAt,
 
@@ -97,31 +93,28 @@ export async function GET(
         accessType: access.accessType,
         grantedAt: access.grantedAt,
         expiresAt: access.expiresAt,
-        isActive: access.isActive,
-        createdAt: access.createdAt
+        isActive: !access.expiresAt || access.expiresAt > new Date()
       })),
 
       // 观看历史详情
-      watchHistory: video.watchHistory.map(history => ({
+      watchHistories: video.watchHistories.map(history => ({
         id: history.id,
         user: history.user,
-        watchTime: history.watchTime,
         progress: history.progress,
-        lastWatched: history.lastWatched,
-        createdAt: history.createdAt
+        watchedAt: history.watchedAt
       })),
 
       // 统计信息
       stats: {
         totalAccess: video.videoAccesses.length,
-        activeAccess: video.videoAccesses.filter(access => access.isActive).length,
-        totalViews: video.watchHistory.length,
-        uniqueViewers: [...new Set(video.watchHistory.map(h => h.userId))].length,
-        totalWatchTime: video.watchHistory.reduce((total, history) => total + history.watchTime, 0),
-        averageProgress: video.watchHistory.length > 0 
-          ? video.watchHistory.reduce((total, history) => total + history.progress, 0) / video.watchHistory.length 
+        activeAccess: video.videoAccesses.filter(access => !access.expiresAt || access.expiresAt > new Date()).length,
+        totalViews: video.watchHistories.length,
+        uniqueViewers: [...new Set(video.watchHistories.map(h => h.userId))].length,
+        totalWatchRecords: video.watchHistories.length,
+        averageProgress: video.watchHistories.length > 0 
+          ? video.watchHistories.reduce((total, history) => total + history.progress, 0) / video.watchHistories.length 
           : 0,
-        completionRate: video.watchHistory.filter(h => h.progress >= 0.9).length / Math.max(video.watchHistory.length, 1)
+        completionRate: video.watchHistories.filter(h => h.progress >= 0.9).length / Math.max(video.watchHistories.length, 1)
       }
     };
 

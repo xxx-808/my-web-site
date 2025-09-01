@@ -38,7 +38,7 @@ export async function GET() {
             }
           }
         },
-        watchHistory: {
+        watchHistories: {
           include: {
             video: {
               include: {
@@ -47,7 +47,7 @@ export async function GET() {
             }
           },
           orderBy: {
-            lastWatched: 'desc'
+            watchedAt: 'desc'
           },
           take: 10
         }
@@ -86,13 +86,12 @@ export async function GET() {
         }, {} as Record<string, number>)
       },
       // 观看历史
-      watchHistory: user.watchHistory.map(history => ({
+      watchHistories: user.watchHistories.map(history => ({
         videoId: history.video.id,
         videoTitle: history.video.title,
         category: history.video.category.name,
-        watchTime: history.watchTime,
         progress: history.progress,
-        lastWatched: history.lastWatched
+        watchedAt: history.watchedAt
       }))
     };
 

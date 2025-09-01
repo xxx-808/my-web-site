@@ -19,12 +19,12 @@ export async function POST(
 
     const userId = session.user.id as string;
     const body = await request.json();
-    const { watchTime, progress } = body;
+    const { progress } = body;
 
     // 验证参数
-    if (typeof watchTime !== 'number' || typeof progress !== 'number') {
+    if (typeof progress !== 'number') {
       return NextResponse.json({ 
-        error: 'Invalid parameters' 
+        error: 'Progress must be a number' 
       }, { status: 400 });
     }
 
@@ -34,35 +34,41 @@ export async function POST(
       }, { status: 400 });
     }
 
-    // 更新或创建观看历史
-    const watchHistory = await prisma.watchHistory.upsert({
+    // 查找现有观看历史
+    let watchHistory = await prisma.watchHistory.findFirst({
       where: {
-        userId_videoId: {
-          userId: userId,
-          videoId: videoId
-        }
-      },
-      update: {
-        watchTime: watchTime,
-        progress: progress,
-        lastWatched: new Date()
-      },
-      create: {
         userId: userId,
-        videoId: videoId,
-        watchTime: watchTime,
-        progress: progress,
-        lastWatched: new Date()
+        videoId: videoId
       }
     });
+
+    if (watchHistory) {
+      // 更新现有记录
+      watchHistory = await prisma.watchHistory.update({
+        where: { id: watchHistory.id },
+        data: {
+          progress: progress,
+          watchedAt: new Date()
+        }
+      });
+    } else {
+      // 创建新记录
+      watchHistory = await prisma.watchHistory.create({
+        data: {
+          userId: userId,
+          videoId: videoId,
+          progress: progress,
+          watchedAt: new Date()
+        }
+      });
+    }
 
     return NextResponse.json({
       message: 'Progress updated successfully',
       data: {
         videoId: watchHistory.videoId,
-        watchTime: watchHistory.watchTime,
         progress: watchHistory.progress,
-        lastWatched: watchHistory.lastWatched
+        watchedAt: watchHistory.watchedAt
       }
     });
 
@@ -92,32 +98,28 @@ export async function GET(
     const userId = session.user.id as string;
 
     // 获取观看历史
-    const watchHistory = await prisma.watchHistory.findUnique({
+    const watchHistory = await prisma.watchHistory.findFirst({
       where: {
-        userId_videoId: {
-          userId: userId,
-          videoId: videoId
-        }
+        userId: userId,
+        videoId: videoId
       }
     });
 
     if (!watchHistory) {
       return NextResponse.json({
-        data: {
-          videoId: videoId,
-          watchTime: 0,
-          progress: 0,
-          lastWatched: null
-        }
+              data: {
+        videoId: videoId,
+        progress: 0,
+        watchedAt: null
+      }
       });
     }
 
     return NextResponse.json({
       data: {
         videoId: watchHistory.videoId,
-        watchTime: watchHistory.watchTime,
         progress: watchHistory.progress,
-        lastWatched: watchHistory.lastWatched
+        watchedAt: watchHistory.watchedAt
       }
     });
 

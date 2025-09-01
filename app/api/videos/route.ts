@@ -42,14 +42,13 @@ export async function GET(request: NextRequest) {
         videoAccesses: {
           where: {
             userId: userId,
-            isActive: true,
             OR: [
               { expiresAt: null },
               { expiresAt: { gte: new Date() } }
             ]
           }
         },
-        watchHistory: {
+        watchHistories: {
           where: {
             userId: userId
           }

@@ -29,7 +29,6 @@ export async function GET(
         videoAccesses: {
           where: {
             userId: userId,
-            isActive: true,
             OR: [
               { expiresAt: null },
               { expiresAt: { gte: new Date() } }
@@ -87,23 +86,33 @@ export async function GET(
 
     // 记录观看历史
     try {
-      await prisma.watchHistory.upsert({
+      // 查找现有观看历史
+      let watchHistory = await prisma.watchHistory.findFirst({
         where: {
-          userId_videoId: {
-            userId: userId,
-            videoId: video.id
-          }
-        },
-        update: {
-          lastWatched: new Date()
-        },
-        create: {
           userId: userId,
-          videoId: video.id,
-          watchTime: 0,
-          progress: 0
+          videoId: video.id
         }
       });
+
+      if (watchHistory) {
+        // 更新现有记录
+        await prisma.watchHistory.update({
+          where: { id: watchHistory.id },
+          data: {
+            watchedAt: new Date()
+          }
+        });
+      } else {
+        // 创建新记录
+        await prisma.watchHistory.create({
+          data: {
+            userId: userId,
+            videoId: video.id,
+            progress: 0,
+            watchedAt: new Date()
+          }
+        });
+      }
     } catch (error) {
       console.error('Failed to update watch history:', error);
     }

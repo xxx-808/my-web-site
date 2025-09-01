@@ -76,7 +76,7 @@ export async function GET(request: NextRequest) {
               }
             }
           },
-          watchHistory: {
+          watchHistories: {
             include: {
               user: {
                 select: {
@@ -103,27 +103,23 @@ export async function GET(request: NextRequest) {
       description: video.description,
       category: {
         id: video.category.id,
-        name: video.category.name,
-        displayName: video.category.displayName
+        name: video.category.name
       },
       duration: video.duration,
-      filePath: video.filePath,
+      url: video.url,
       thumbnail: video.thumbnail,
       accessLevel: video.accessLevel,
       status: video.status,
-      tags: video.tags,
-      cognitiveObjectives: video.cognitiveObjectives,
-      uploadDate: video.uploadDate,
       createdAt: video.createdAt,
       updatedAt: video.updatedAt,
       
       // 统计信息
       stats: {
         accessCount: video.videoAccesses.length,
-        watchCount: video.watchHistory.length,
-        totalWatchTime: video.watchHistory.reduce((total, history) => total + history.watchTime, 0),
-        averageProgress: video.watchHistory.length > 0 
-          ? video.watchHistory.reduce((total, history) => total + history.progress, 0) / video.watchHistory.length 
+        watchCount: video.watchHistories.length,
+        totalWatchRecords: video.watchHistories.length,
+        averageProgress: video.watchHistories.length > 0 
+          ? video.watchHistories.reduce((total, history) => total + history.progress, 0) / video.watchHistories.length 
           : 0
       },
 
@@ -135,7 +131,7 @@ export async function GET(request: NextRequest) {
         accessType: access.accessType,
         grantedAt: access.grantedAt,
         expiresAt: access.expiresAt,
-        isActive: access.isActive
+        isActive: !access.expiresAt || access.expiresAt > new Date()
       }))
     }));
 
@@ -185,11 +181,9 @@ export async function POST(request: NextRequest) {
       description, 
       categoryId, 
       duration, 
-      filePath, 
+      url, 
       thumbnail, 
-      accessLevel, 
-      tags, 
-      cognitiveObjectives 
+      accessLevel
     } = body;
 
     // 验证必填字段
@@ -216,12 +210,10 @@ export async function POST(request: NextRequest) {
         title,
         description,
         categoryId,
-        duration: duration || '00:00',
-        filePath: filePath || '',
+        duration: duration || 0,
+        url: url || '',
         thumbnail: thumbnail || 'https://picsum.photos/id/1000/400/225',
-        accessLevel: accessLevel?.toUpperCase() || 'BASIC',
-        tags: tags || [],
-        cognitiveObjectives: cognitiveObjectives || []
+        accessLevel: accessLevel?.toUpperCase() || 'BASIC'
       },
       include: {
         category: true
@@ -278,11 +270,9 @@ export async function PUT(request: NextRequest) {
       description, 
       categoryId, 
       duration, 
-      filePath, 
+      url, 
       thumbnail, 
-      accessLevel, 
-      tags, 
-      cognitiveObjectives,
+      accessLevel,
       status
     } = body;
 
@@ -312,11 +302,9 @@ export async function PUT(request: NextRequest) {
         ...(description && { description }),
         ...(categoryId && { categoryId }),
         ...(duration && { duration }),
-        ...(filePath && { filePath }),
+        ...(url && { url }),
         ...(thumbnail && { thumbnail }),
         ...(accessLevel && { accessLevel: accessLevel.toUpperCase() }),
-        ...(tags && { tags }),
-        ...(cognitiveObjectives && { cognitiveObjectives }),
         ...(status && { status: status.toUpperCase() })
       },
       include: {
