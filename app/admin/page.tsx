@@ -28,7 +28,6 @@ interface VideoData {
   description: string;
   category: {
     name: string;
-    displayName: string;
   };
   accessLevel: string;
   status: string;
@@ -474,7 +473,7 @@ export default function AdminPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">分类:</span>
-                      <span>{video.category.displayName}</span>
+                                              <span>{video.category.name}</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-500">访问级别:</span>

@@ -11,16 +11,12 @@ interface Video {
   category: {
     id: string;
     name: string;
-    displayName: string;
   };
-  duration: string;
-  filePath: string;
+  duration: number;
+  url: string;
   thumbnail: string;
-  uploadDate: string;
   status: "ACTIVE" | "INACTIVE" | "PROCESSING";
   accessLevel: "BASIC" | "PREMIUM";
-  tags: string[];
-  cognitiveObjectives: string[];
   stats: {
     accessCount: number;
     watchCount: number;
@@ -40,7 +36,6 @@ interface Video {
 interface VideoCategory {
   id: string;
   name: string;
-  displayName: string;
 }
 
 interface User {
@@ -56,8 +51,6 @@ type NewVideo = {
   description: string;
   categoryId: string;
   accessLevel: "BASIC" | "PREMIUM";
-  tags: string[];
-  cognitiveObjectives: string[];
 };
 
 export default function VideoManagementPage() {
@@ -80,9 +73,7 @@ export default function VideoManagementPage() {
     title: "",
     description: "",
     categoryId: "",
-    accessLevel: "BASIC",
-    tags: [] as string[],
-    cognitiveObjectives: [] as string[]
+    accessLevel: "BASIC"
   });
 
   const checkAuthentication = useCallback(() => {
@@ -132,13 +123,13 @@ export default function VideoManagementPage() {
         const categoriesData = await categoriesResponse.json();
         setCategories(categoriesData.categories);
       } else {
-        // 使用默认分类
-        setCategories([
-          { id: "writing", name: "writing", displayName: "写作技能" },
-          { id: "speaking", name: "speaking", displayName: "口语表达" },
-          { id: "reading", name: "reading", displayName: "阅读策略" },
-          { id: "listening", name: "listening", displayName: "听力技巧" }
-        ]);
+                 // 使用默认分类
+         setCategories([
+           { id: "writing", name: "写作技能" },
+           { id: "speaking", name: "口语表达" },
+           { id: "reading", name: "阅读策略" },
+           { id: "listening", name: "听力技巧" }
+         ]);
       }
 
       if (usersResponse.ok) {
@@ -198,13 +189,11 @@ export default function VideoManagementPage() {
 
       if (response.ok) {
         alert("视频创建成功");
-        setNewVideo({
-          title: "",
-          description: "",
+    setNewVideo({
+      title: "",
+      description: "",
           categoryId: "",
-          accessLevel: "BASIC",
-          tags: [],
-          cognitiveObjectives: []
+          accessLevel: "BASIC"
         });
         loadData(); // 重新加载数据
       } else {
@@ -316,7 +305,7 @@ export default function VideoManagementPage() {
 
       if (response.ok) {
         alert("批量操作成功");
-        setSelectedVideos([]);
+          setSelectedVideos([]);
         loadData();
       } else {
         const error = await response.json();
@@ -345,46 +334,46 @@ export default function VideoManagementPage() {
         <div className="px-4 py-6 sm:px-0">
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-3xl font-bold text-gray-900">视频管理</h1>
-            <button
+              <button
               onClick={() => router.push("/admin")}
               className="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors"
-            >
+              >
               返回管理面板
-            </button>
-          </div>
+              </button>
+        </div>
 
           {/* 标签页导航 */}
           <div className="border-b border-gray-200 mb-6">
-            <nav className="-mb-px flex space-x-8">
-              {[
+          <nav className="-mb-px flex space-x-8">
+            {[
                 { id: 'upload', name: '上传视频', icon: '📤' },
                 { id: 'manage', name: '管理视频', icon: '🎬' },
                 { id: 'access', name: '访问权限', icon: '🔐' },
-                { id: 'batch', name: '批量操作', icon: '⚡' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
+              { id: 'batch', name: '批量操作', icon: '⚡' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
                   onClick={() => setActiveTab(tab.id as 'upload' | 'manage' | 'batch' | 'access')}
-                  className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                    activeTab === tab.id
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === tab.id
                       ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                }`}
+              >
                   <span className="mr-2">{tab.icon}</span>
                   {tab.name}
-                </button>
-              ))}
-            </nav>
-          </div>
+              </button>
+            ))}
+          </nav>
+        </div>
 
           {/* 上传视频标签页 */}
-          {activeTab === 'upload' && (
+        {activeTab === 'upload' && (
             <div className="bg-white shadow rounded-lg p-6">
               <h2 className="text-xl font-semibold mb-4">上传新视频</h2>
-              
+            
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
+              <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     视频文件
                   </label>
@@ -395,20 +384,20 @@ export default function VideoManagementPage() {
                     onChange={handleFileUpload}
                     className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                   />
-                  {uploading && (
+                {uploading && (
                     <div className="mt-2">
-                      <div className="w-full bg-gray-200 rounded-full h-2">
-                        <div
+                    <div className="w-full bg-gray-200 rounded-full h-2">
+                      <div 
                           className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${uploadProgress}%` }}
-                        ></div>
-                      </div>
-                      <p className="text-sm text-gray-600 mt-1">上传进度: {uploadProgress}%</p>
+                        style={{ width: `${uploadProgress}%` }}
+                      ></div>
                     </div>
-                  )}
-                </div>
+                      <p className="text-sm text-gray-600 mt-1">上传进度: {uploadProgress}%</p>
+                  </div>
+                )}
+              </div>
 
-                <div>
+              <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     缩略图
                   </label>
@@ -421,20 +410,20 @@ export default function VideoManagementPage() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div>
+                  <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     标题 *
-                  </label>
-                  <input
-                    type="text"
-                    value={newVideo.title}
-                    onChange={(e) => setNewVideo({...newVideo, title: e.target.value})}
+                    </label>
+                    <input
+                      type="text"
+                      value={newVideo.title}
+                      onChange={(e) => setNewVideo({...newVideo, title: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="输入视频标题"
-                  />
-                </div>
-
-                <div>
+                    />
+                  </div>
+                  
+                  <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     分类 *
                   </label>
@@ -444,11 +433,11 @@ export default function VideoManagementPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">选择分类</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.displayName}
-                      </option>
-                    ))}
+                                         {categories.map((category) => (
+                       <option key={category.id} value={category.id}>
+                         {category.name}
+                       </option>
+                     ))}
                   </select>
                 </div>
               </div>
@@ -456,43 +445,33 @@ export default function VideoManagementPage() {
               <div className="mt-6">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   描述 *
-                </label>
-                <textarea
-                  value={newVideo.description}
-                  onChange={(e) => setNewVideo({...newVideo, description: e.target.value})}
-                  rows={3}
+                    </label>
+                    <textarea
+                      value={newVideo.description}
+                      onChange={(e) => setNewVideo({...newVideo, description: e.target.value})}
+                      rows={3}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="输入视频描述"
-                />
-              </div>
+                    />
+                  </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                <div>
+                    <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    访问级别
-                  </label>
-                  <select
-                    value={newVideo.accessLevel}
+                        访问级别
+                      </label>
+                      <select
+                        value={newVideo.accessLevel}
                     onChange={(e) => setNewVideo({...newVideo, accessLevel: e.target.value as "BASIC" | "PREMIUM"})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
+                      >
                     <option value="BASIC">基础用户</option>
                     <option value="PREMIUM">高级用户</option>
-                  </select>
-                </div>
+                      </select>
+                  </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    标签
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="用逗号分隔多个标签"
-                    onChange={(e) => setNewVideo({...newVideo, tags: e.target.value.split(',').map(tag => tag.trim())})}
-                  />
+                
                 </div>
-              </div>
 
               <div className="mt-6">
                 <button
@@ -501,39 +480,39 @@ export default function VideoManagementPage() {
                 >
                   创建视频
                 </button>
-              </div>
             </div>
-          )}
+          </div>
+        )}
 
           {/* 管理视频标签页 */}
-          {activeTab === 'manage' && (
+        {activeTab === 'manage' && (
             <div className="bg-white shadow rounded-lg">
               <div className="px-6 py-4 border-b border-gray-200">
                 <h2 className="text-xl font-semibold">视频列表</h2>
-              </div>
-              
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        视频信息
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        分类
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        访问级别
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+            </div>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      视频信息
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      分类
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      访问级别
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                         统计
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        操作
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      操作
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
                     {videos.length === 0 ? (
                       <tr>
                         <td colSpan={5} className="px-6 py-12 text-center">
@@ -548,11 +527,11 @@ export default function VideoManagementPage() {
                       videos.map((video) => (
                         <tr key={video.id}>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <div className="flex items-center">
+                        <div className="flex items-center">
                               <Image
                                 className="h-12 w-20 object-cover rounded"
-                                src={video.thumbnail}
-                                alt={video.title}
+                            src={video.thumbnail} 
+                            alt={video.title}
                                 width={80}
                                 height={48}
                               />
@@ -563,23 +542,23 @@ export default function VideoManagementPage() {
                                 <div className="text-sm text-gray-500">
                                   {video.description.substring(0, 50)}...
                                 </div>
-                              </div>
-                            </div>
-                          </td>
+                          </div>
+                        </div>
+                      </td>
+                                                     <td className="px-6 py-4 whitespace-nowrap">
+                             <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                               {video.category.name}
+                             </span>
+                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
-                              {video.category.displayName}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                               video.accessLevel === 'PREMIUM' 
                                 ? 'bg-purple-100 text-purple-800' 
                                 : 'bg-green-100 text-green-800'
                             }`}>
                               {video.accessLevel}
-                            </span>
-                          </td>
+                        </span>
+                      </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             <div>访问: {video.stats.accessCount}</div>
                             <div>观看: {video.stats.watchCount}</div>
@@ -717,8 +696,8 @@ export default function VideoManagementPage() {
                             <td className="px-6 py-4 whitespace-nowrap">
                               <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                                 {access.accessType}
-                              </span>
-                            </td>
+                        </span>
+                      </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {new Date(access.grantedAt).toLocaleDateString()}
                             </td>
@@ -726,14 +705,14 @@ export default function VideoManagementPage() {
                               {access.expiresAt ? new Date(access.expiresAt).toLocaleDateString() : '永久'}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                                 access.isActive 
                                   ? 'bg-green-100 text-green-800' 
                                   : 'bg-red-100 text-red-800'
-                              }`}>
+                        }`}>
                                 {access.isActive ? '有效' : '无效'}
-                              </span>
-                            </td>
+                        </span>
+                      </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                               <button
                                 onClick={() => handleRevokeAccess(access.userId, selectedVideoForAccess.id)}
@@ -741,19 +720,19 @@ export default function VideoManagementPage() {
                               >
                                 撤销
                               </button>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
                 </div>
               )}
-            </div>
-          )}
+          </div>
+        )}
 
           {/* 批量操作标签页 */}
-          {activeTab === 'batch' && (
+        {activeTab === 'batch' && (
             <div className="bg-white shadow rounded-lg p-6">
               <h2 className="text-xl font-semibold mb-4">批量操作</h2>
               
@@ -763,12 +742,12 @@ export default function VideoManagementPage() {
                     <div className="text-6xl mb-4">⚡</div>
                     <div className="text-lg font-medium mb-2">暂无视频可操作</div>
                     <div className="text-sm mb-4">请先在上传视频标签页中添加视频，然后才能进行批量操作</div>
-                    <button
+                  <button
                       onClick={() => setActiveTab('upload')}
                       className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                    >
+                  >
                       去上传视频
-                    </button>
+                  </button>
                   </div>
                 </div>
               ) : (
@@ -796,8 +775,8 @@ export default function VideoManagementPage() {
                         </label>
                       ))}
                     </div>
-                  </div>
-
+                </div>
+                
                   <div className="space-x-4">
                     <button
                       onClick={() => handleBatchOperation('delete')}
@@ -805,25 +784,25 @@ export default function VideoManagementPage() {
                     >
                       批量删除
                     </button>
-                    <button
-                      onClick={() => handleBatchOperation('activate')}
+                  <button
+                    onClick={() => handleBatchOperation('activate')}
                       className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
-                    >
-                      批量激活
-                    </button>
-                    <button
-                      onClick={() => handleBatchOperation('deactivate')}
+                  >
+                    批量激活
+                  </button>
+                  <button
+                    onClick={() => handleBatchOperation('deactivate')}
                       className="bg-yellow-600 text-white px-4 py-2 rounded-lg hover:bg-yellow-700 transition-colors"
-                    >
-                      批量停用
-                    </button>
-                  </div>
+                  >
+                    批量停用
+                  </button>
+                </div>
                 </>
               )}
-            </div>
+              </div>
           )}
-        </div>
-      </div>
+                    </div>
+                  </div>
     </div>
   );
 }

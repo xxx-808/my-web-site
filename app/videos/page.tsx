@@ -10,80 +10,15 @@ interface VideoAccess {
   title: string;
   description: string;
   thumbnail: string;
-  duration: string;
-  uploadedAt: string; // ISO date for sorting
-  category: "writing" | "speaking" | "reading" | "listening";
-  categoryDisplayName: string;
-  accessLevel: Plan;
+  duration: number;
+  category: string;
+  accessLevel: string;
   canAccess: boolean;
   watchProgress: number;
   lastWatched?: string;
-  tags: string[];
-  cognitiveObjectives: string[];
 }
 
-const sampleVideos: VideoAccess[] = [
-  {
-    id: "ielts-writing-task1",
-    title: "雅思写作 Task 1 - 图表描述技巧",
-    description: "掌握各类图表描述的核心词汇和句型结构，提升写作得分。",
-    thumbnail: "https://picsum.photos/id/1018/400/225",
-    duration: "45:30",
-    uploadedAt: "2024-08-19",
-    category: "writing",
-    categoryDisplayName: "写作技能",
-    accessLevel: "pro",
-    canAccess: true,
-    watchProgress: 0,
-    tags: ["写作", "Task1", "图表描述"],
-    cognitiveObjectives: ["提高图表分析能力", "培养逻辑表达思维"]
-  },
-  {
-    id: "ielts-speaking-part2",
-    title: "雅思口语 Part 2 - 话题展开策略",
-    description: "学会如何用2分钟时间完整展开一个话题，避免冷场。",
-    thumbnail: "https://picsum.photos/id/1019/400/225",
-    duration: "38:15",
-    uploadedAt: "2024-08-18",
-    category: "speaking",
-    categoryDisplayName: "口语表达",
-    accessLevel: "pro",
-    canAccess: true,
-    watchProgress: 0,
-    tags: ["口语", "Part2", "话题展开"],
-    cognitiveObjectives: ["提高口语流利度", "增强话题组织能力"]
-  },
-  {
-    id: "ielts-reading-skills",
-    title: "雅思阅读 - 快速定位与理解技巧",
-    description: "掌握Skimming和Scanning技巧，提高阅读速度和准确率。",
-    thumbnail: "https://picsum.photos/id/1020/400/225",
-    duration: "52:20",
-    uploadedAt: "2024-08-17",
-    category: "reading",
-    categoryDisplayName: "阅读策略",
-    accessLevel: "basic",
-    canAccess: true,
-    watchProgress: 0,
-    tags: ["阅读", "定位技巧", "理解策略"],
-    cognitiveObjectives: ["提高阅读速度", "增强理解能力"]
-  },
-  {
-    id: "ielts-listening-predict",
-    title: "雅思听力 - 预测技巧与关键词识别",
-    description: "通过关键词预测与场景推断提升正确率。",
-    thumbnail: "https://picsum.photos/id/1021/400/225",
-    duration: "41:20",
-    uploadedAt: "2024-08-16",
-    category: "listening",
-    categoryDisplayName: "听力技巧",
-    accessLevel: "basic",
-    canAccess: true,
-    watchProgress: 0,
-    tags: ["听力", "预测技巧", "关键词"],
-    cognitiveObjectives: ["提高听力理解", "增强预测能力"]
-  },
-];
+
 
 export default function VideosPage() {
   const [videos, setVideos] = useState<VideoAccess[]>([]);
@@ -445,11 +380,11 @@ export default function VideosPage() {
                     {/* Video Info */}
                     <div className="mt-4 pt-4 border-t border-gray-200">
                       <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-                        <span>分类: {selectedVideo.categoryDisplayName}</span>
+                        <span>分类: {selectedVideo.category}</span>
                         <span>时长: {selectedVideo.duration}</span>
                     </div>
                       <div className="flex items-center justify-between text-xs text-gray-500">
-                        <span>上传: {new Date(selectedVideo.uploadedAt).toLocaleDateString()}</span>
+        
                         <span className={`px-2 py-1 rounded-full ${
                           selectedVideo.accessLevel === "pro"
                             ? "bg-purple-100 text-purple-800"

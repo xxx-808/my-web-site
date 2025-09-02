@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
         }
       },
       orderBy: {
-        uploadDate: 'desc'
+        createdAt: 'desc'
       }
     });
 
@@ -87,16 +87,12 @@ export async function GET(request: NextRequest) {
         title: video.title,
         description: video.description,
         category: video.category.name,
-        categoryDisplayName: video.category.displayName,
         duration: video.duration,
         thumbnail: video.thumbnail,
         accessLevel: video.accessLevel,
-        tags: video.tags,
-        cognitiveObjectives: video.cognitiveObjectives,
-        uploadDate: video.uploadDate,
         canAccess,
-                 watchProgress,
-         lastWatched: lastWatched,
+        watchProgress,
+        lastWatched: lastWatched,
         // 访问权限详情
         accessInfo: {
           hasDirectAccess,
