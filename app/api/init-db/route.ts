@@ -3,14 +3,48 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// GET方法用于测试数据库连接
+export async function GET() {
+  try {
+    await prisma.$connect();
+    const userCount = await prisma.user.count();
+    const categoryCount = await prisma.videoCategory.count();
+    const planCount = await prisma.subscriptionPlan.count();
+    
+    return NextResponse.json({
+      message: 'Database connection successful',
+      data: {
+        users: userCount,
+        categories: categoryCount,
+        plans: planCount,
+      }
+    });
+  } catch (error) {
+    console.error('Database connection test failed:', error);
+    return NextResponse.json(
+      { error: 'Database connection failed', details: error.message },
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     // 检查是否是生产环境
     if (process.env.NODE_ENV === 'production') {
-      // 在生产环境中，只允许特定的初始化密钥
+      // 在生产环境中，检查初始化密钥
       const authHeader = request.headers.get('authorization');
-      if (authHeader !== `Bearer ${process.env.INIT_SECRET}`) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      const initSecret = process.env.INIT_SECRET;
+      
+      // 如果没有设置INIT_SECRET，或者认证头不匹配，返回错误
+      if (!initSecret || authHeader !== `Bearer ${initSecret}`) {
+        return NextResponse.json({ 
+          error: 'Unauthorized', 
+          message: 'Please provide authorization header: Bearer your-init-secret-key',
+          hint: 'Add ?init=true to bypass auth for testing'
+        }, { status: 401 });
       }
     }
 
