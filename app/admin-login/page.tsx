@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 
 interface Admin {
@@ -22,13 +22,13 @@ export default function AdminLoginPage() {
 
   // 恢复登录状态（本地存储）
   // 模拟管理员数据
-  const mockAdmin: Admin = {
+  const mockAdmin: Admin = useMemo(() => ({
     id: "admin_001",
     name: "管理员",
     email: "admin@tiffanyscollege.com",
     role: "超级管理员",
     permissions: ["用户管理", "视频管理"],
-  };
+  }), []);
 
   useEffect(() => {
     try {
@@ -102,7 +102,7 @@ export default function AdminLoginPage() {
                 </div>
                 <button
                   onClick={handleLogout}
-                  className="bg-red-600 hover:bg-red-700 text白 px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
                 >
                   退出登录
                 </button>
@@ -115,25 +115,25 @@ export default function AdminLoginPage() {
         <main className="max-w-7xl mx-auto px-4 py-8">
           {/* Two Modules Only */}
           <div className="grid md:grid-cols-2 gap-6 mb-8">
-            <div className="bg白 rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow">
               <div className="text-4xl mb-3">👥</div>
               <h4 className="text-lg font-semibold text-gray-900 mb-2">用户管理</h4>
               <p className="text-sm text-gray-600 mb-4">管理学生账户、权限与订阅套餐</p>
               <button 
                 onClick={() => router.push("/admin")}
-                className="w-full bg-purple-600 hover:bg-purple-700 text白 py-2 px-4 rounded-md text-sm font-medium transition-colors"
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-md text-sm font-medium transition-colors"
               >
                 进入用户管理
               </button>
             </div>
 
-            <div className="bg白 rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow">
+            <div className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-shadow">
               <div className="text-4xl mb-3">🎥</div>
               <h4 className="text-lg font-semibold text-gray-900 mb-2">视频管理</h4>
               <p className="text-sm text-gray-600 mb-4">上传、编辑与访问控制（Basic/Pro）</p>
               <button 
                 onClick={() => router.push("/admin/video-management")}
-                className="w-full bg-purple-600 hover:bg-purple-700 text白 py-2 px-4 rounded-md text-sm font-medium transition-colors"
+                className="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-md text-sm font-medium transition-colors"
               >
                 进入视频管理
               </button>
@@ -198,7 +198,7 @@ export default function AdminLoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text白 bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? "登录中..." : "登录"}
             </button>
