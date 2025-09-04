@@ -10,7 +10,8 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "tsx prisma/reset-db.ts"
+    "db:reset": "tsx prisma/reset-db.ts",
+    "db:init": "curl -X POST http://localhost:3000/api/init-db"
   },
   "dependencies": {
     "next": "15.5.0",
