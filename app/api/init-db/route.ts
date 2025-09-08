@@ -22,7 +22,7 @@ export async function GET() {
   } catch (error) {
     console.error('Database connection test failed:', error);
     return NextResponse.json(
-      { error: 'Database connection failed', details: error.message },
+      { error: 'Database connection failed', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   } finally {
