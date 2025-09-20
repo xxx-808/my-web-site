@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { writeFile, mkdir } from 'fs/promises';
-import { existsSync } from 'fs';
-import path from 'path';
+import { put } from '@vercel/blob';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
@@ -51,35 +49,30 @@ export async function POST(request: NextRequest) {
     // 生成唯一文件名
     const timestamp = Date.now();
     const originalName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const fileName = `${timestamp}_${originalName}`;
-    
-    // 确保上传目录存在
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'videos');
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true });
-    }
+    const fileName = `videos/${timestamp}_${originalName}`;
 
-    // 保存文件
-    const filePath = path.join(uploadDir, fileName);
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    
-    await writeFile(filePath, buffer);
+    // 上传到Vercel Blob云存储
+    const blob = await put(fileName, file, {
+      access: 'public',
+      contentType: file.type,
+    });
 
-    // 生成访问URL
-    const fileUrl = `/uploads/videos/${fileName}`;
+    // 云存储URL
+    const fileUrl = blob.url;
 
     // 返回文件信息
     return NextResponse.json({
       success: true,
-      message: 'Video uploaded successfully',
+      message: 'Video uploaded successfully to cloud storage',
       data: {
-        fileName,
+        fileName: fileName,
         originalName: file.name,
         size: file.size,
         type: file.type,
         url: fileUrl,
-        uploadedAt: new Date().toISOString()
+        blobUrl: blob.url,
+        uploadedAt: new Date().toISOString(),
+        storage: 'vercel-blob'
       }
     });
 
