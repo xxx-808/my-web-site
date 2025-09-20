@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试视频播放</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .video-container {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        .info {
+            padding: 15px;
+            background: #f5f5f5;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎬 视频播放测试</h1>
+    
+    <div class="info">
+        <h2>测试您的云存储视频</h2>
+        <p><strong>视频URL：</strong><br>
+        <code>https://32eqetnp69vf1ntv.public.blob.vercel-storage.com/video/841a11e088af31b2203caa7367d3b09d.mp4</code></p>
+    </div>
+    
+    <div class="video-container">
+        <video 
+            id="testVideo"
+            controls 
+            preload="metadata"
+            crossorigin="anonymous"
+            poster="https://picsum.photos/800/450?random=speaking"
+        >
+            <source src="https://32eqetnp69vf1ntv.public.blob.vercel-storage.com/video/841a11e088af31b2203caa7367d3b09d.mp4" type="video/mp4">
+            您的浏览器不支持视频播放。
+        </video>
+    </div>
+    
+    <div class="info">
+        <h3>测试结果：</h3>
+        <div id="testResults">等待测试...</div>
+        
+        <h3>浏览器控制台日志：</h3>
+        <div id="consoleLog" style="background: #000; color: #0f0; padding: 10px; font-family: monospace; max-height: 300px; overflow-y: auto;"></div>
+    </div>
+    
+    <script>
+        const video = document.getElementById('testVideo');
+        const results = document.getElementById('testResults');
+        const consoleLog = document.getElementById('consoleLog');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            console.log(logEntry);
+            
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = logEntry;
+            consoleLog.appendChild(div);
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+        }
+        
+        // 视频事件监听
+        video.addEventListener('loadstart', () => {
+            log('✅ 开始加载视频...', 'success');
+        });
+        
+        video.addEventListener('loadedmetadata', () => {
+            log(`✅ 视频元数据加载完成`, 'success');
+            log(`   时长: ${video.duration.toFixed(2)}秒`, 'success');
+            log(`   分辨率: ${video.videoWidth}x${video.videoHeight}`, 'success');
+            
+            results.innerHTML = `
+                <div class="success">✅ 视频加载成功！</div>
+                <ul>
+                    <li>时长: ${Math.floor(video.duration / 60)}分${Math.floor(video.duration % 60)}秒</li>
+                    <li>分辨率: ${video.videoWidth}x${video.videoHeight}</li>
+                    <li>可以播放: 是</li>
+                </ul>
+            `;
+        });
+        
+        video.addEventListener('error', (e) => {
+            const errorCode = video.error?.code || 'unknown';
+            const errorMessage = video.error?.message || '未知错误';
+            
+            log(`❌ 视频加载错误: ${errorMessage} (代码: ${errorCode})`, 'error');
+            
+            results.innerHTML = `
+                <div class="error">❌ 视频加载失败！</div>
+                <ul>
+                    <li>错误代码: ${errorCode}</li>
+                    <li>错误信息: ${errorMessage}</li>
+                    <li>可能原因: CORS限制、文件不存在或格式不支持</li>
+                </ul>
+            `;
+        });
+        
+        video.addEventListener('canplay', () => {
+            log('✅ 视频可以开始播放', 'success');
+        });
+        
+        video.addEventListener('play', () => {
+            log('▶️ 视频开始播放', 'success');
+        });
+        
+        video.addEventListener('pause', () => {
+            log('⏸️ 视频暂停', 'info');
+        });
+        
+        // 初始化测试
+        setTimeout(() => {
+            log('🚀 开始测试视频加载...', 'info');
+            log(`📍 视频URL: ${video.src}`, 'info');
+        }, 100);
+    </script>
+</body>
+</html>

@@ -15,6 +15,7 @@ interface VideoAccess {
   accessLevel: string;
   canAccess: boolean;
   watchProgress: number;
+  url?: string; // 添加URL字段
   lastWatched?: string;
 }
 
@@ -55,14 +56,10 @@ export default function VideosPage() {
     }
   }, []);
 
-  // 初始化课程
+  // 初始化课程 - 不需要登录，直接获取视频
   useEffect(() => {
-    if (isLoggedIn) {
-      fetchVideos();
-    } else {
-      setIsLoading(false);
-    }
-  }, [isLoggedIn]);
+    fetchVideos();
+  }, []);
 
   const fetchVideos = async () => {
     try {
@@ -113,29 +110,34 @@ export default function VideosPage() {
   }, [videos]);
 
   const handleVideoSelect = (video: VideoAccess) => {
+    // 停止当前播放的视频
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.currentTime = 0;
+    }
+    
     setSelectedVideo(video);
     setIsPlaying(false);
     setCurrentTime(0);
     setDuration(0);
+    
+    console.log('选择视频:', video.title, 'URL:', video.url);
   };
 
-  const handlePlayPause = () => {
-    if (!selectedVideo) return;
+  const handlePlayPause = async () => {
+    if (!selectedVideo || !videoRef.current) return;
     
-    // 检查访问权限
-    if (!selectedVideo.canAccess) {
-    if (selectedVideo.accessLevel === "pro" && plan !== "pro") {
-      alert("此视频为 Pro 会员专享。请升级到 Pro 后观看。");
-      return;
+    try {
+      if (isPlaying) {
+        videoRef.current.pause();
+        setIsPlaying(false);
       } else {
-        alert("您没有访问此视频的权限。请联系管理员。");
-        return;
+        await videoRef.current.play();
+        setIsPlaying(true);
       }
-    }
-    
-    if (videoRef.current) {
-      if (isPlaying) videoRef.current.pause(); else videoRef.current.play();
-      setIsPlaying(!isPlaying);
+    } catch (error) {
+      console.error('播放失败:', error);
+      alert('视频播放失败，请检查网络连接或稍后重试。');
     }
   };
 
@@ -320,8 +322,24 @@ export default function VideosPage() {
                       poster={selectedVideo.thumbnail}
                       onTimeUpdate={handleTimeUpdate}
                       onLoadedMetadata={handleLoadedMetadata}
+                      onPlay={() => setIsPlaying(true)}
+                      onPause={() => setIsPlaying(false)}
+                      onEnded={() => setIsPlaying(false)}
+                      preload="metadata"
+                      crossOrigin="anonymous"
+                      onError={(e) => {
+                        console.error('视频加载错误:', e);
+                        console.error('视频URL:', selectedVideo.url);
+                        setIsPlaying(false);
+                      }}
+                      onLoadStart={() => {
+                        console.log('开始加载视频:', selectedVideo.url);
+                      }}
+                      onCanPlay={() => {
+                        console.log('视频可以播放');
+                      }}
                     >
-                    <source src={`/api/video/${selectedVideo.id}`} type="video/mp4" />
+                    <source src={selectedVideo.url || `/api/video/${selectedVideo.id}`} type="video/mp4" />
                     您的浏览器不支持视频播放。
                   </video>
                     

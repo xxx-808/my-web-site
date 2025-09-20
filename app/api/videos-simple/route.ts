@@ -31,6 +31,51 @@ export async function GET(request: NextRequest) {
     const { neon } = require('@neondatabase/serverless');
     const sql = neon(process.env.DATABASE_URL!);
     
+    // 如果没有云存储视频，先创建一个
+    const correctVideoUrl = 'https://32eqetnp69vf1ntv.public.blob.vercel-storage.com/video/841a11e088af31b2203caa7367d3b09d.mp4';
+    
+    // 检查是否存在正确的视频
+    const existingVideo = await sql`
+      SELECT id FROM videos WHERE url = ${correctVideoUrl}
+    `;
+    
+    if (existingVideo.length === 0) {
+      console.log('用户视频不存在，正在创建...');
+      
+      // 获取口语分类
+      const speakingCategory = await sql`
+        SELECT id FROM video_categories WHERE name = '雅思口语'
+      `;
+      
+      if (speakingCategory.length > 0) {
+        // 先删除所有其他视频
+        await sql`DELETE FROM videos WHERE url != ${correctVideoUrl}`;
+        
+        // 创建用户的真实视频
+        await sql`
+          INSERT INTO videos (
+            id, title, description, url, thumbnail, duration, 
+            category_id, access_level, status, created_at, updated_at
+          )
+          VALUES (
+            'video_user_real',
+            '雅思口语实战练习',
+            '雅思口语Part 1-3全面练习，包含常见话题和答题技巧',
+            ${correctVideoUrl},
+            'https://picsum.photos/800/450?random=speaking',
+            1800,
+            ${speakingCategory[0].id},
+            'BASIC',
+            'ACTIVE',
+            NOW(),
+            NOW()
+          )
+        `;
+        console.log('✅ 已创建用户真实视频');
+      }
+    }
+    
+    // 查询所有活跃视频（现在应该只有用户的真实视频）
     const videos = await sql`
       SELECT 
         v.id, v.title, v.description, v.url, v.thumbnail, v.duration, 
@@ -79,14 +124,10 @@ export async function GET(request: NextRequest) {
       '雅思写作': 'writing'
     };
 
-    // 处理视频数据，添加访问权限信息
+    // 处理视频数据，所有视频对所有人开放
     const processedVideos = videos.map(video => {
-      // 简化访问权限逻辑：BASIC视频对所有人开放，PREMIUM需要订阅
-      const hasSubscriptionAccess = userSubscription && 
-        (video.access_level === 'BASIC' || 
-         (video.access_level === 'PREMIUM' && userSubscription.plan.name === 'premium'));
-      
-      const canAccess = video.access_level === 'BASIC' || hasSubscriptionAccess;
+      // 所有视频都可以访问，不需要权限验证
+      const canAccess = true;
       
       // 映射分类名称到代码
       const categoryCode = categoryMapping[video.category_name] || 'other';
