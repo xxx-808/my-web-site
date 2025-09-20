@@ -65,6 +65,15 @@ export default function VideosPage() {
     try {
       setIsLoading(true);
       
+      // 首先确保用户视频存在于数据库
+      try {
+        const ensureResponse = await fetch('/api/ensure-video');
+        const ensureData = await ensureResponse.json();
+        console.log('确保视频结果:', ensureData);
+      } catch (e) {
+        console.log('确保视频失败:', e);
+      }
+      
       // 获取用户ID（从localStorage中的认证信息）
       const authData = localStorage.getItem("tc_auth");
       let userId = null;
