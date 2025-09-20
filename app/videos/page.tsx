@@ -67,19 +67,37 @@ export default function VideosPage() {
   const fetchVideos = async () => {
     try {
       setIsLoading(true);
-      const response = await fetch('/api/videos');
+      
+      // 获取用户ID（从localStorage中的认证信息）
+      const authData = localStorage.getItem("tc_auth");
+      let userId = null;
+      if (authData) {
+        try {
+          const parsed = JSON.parse(authData);
+          userId = parsed.id;
+        } catch (e) {
+          console.log('解析认证数据失败:', e);
+        }
+      }
+      
+      console.log('获取视频，用户ID:', userId);
+      
+      // 使用简化的API，传递用户ID
+      const apiUrl = userId ? `/api/videos-simple?userId=${userId}` : '/api/videos-simple';
+      const response = await fetch(apiUrl);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('API响应:', data);
         setVideos(data.videos || []);
         setPlan(data.userSubscription?.planName === 'premium' ? 'pro' : 'basic');
       } else {
-        console.error('Failed to fetch videos');
-        // 不设置回退数据，保持空数组
+        const errorText = await response.text();
+        console.error('Failed to fetch videos:', response.status, errorText);
         setVideos([]);
       }
     } catch (error) {
       console.error('Error fetching videos:', error);
-      // 不设置回退数据，保持空数组
       setVideos([]);
     } finally {
       setIsLoading(false);
