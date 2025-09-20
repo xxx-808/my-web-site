@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import VideoUploader from "@/components/VideoUploader";
 
 interface Video {
   id: string;
@@ -75,6 +76,9 @@ export default function VideoManagementPage() {
     categoryId: "",
     accessLevel: "BASIC"
   });
+
+  const [uploadedVideoUrl, setUploadedVideoUrl] = useState<string>('');
+  const [uploadedThumbnailUrl, setUploadedThumbnailUrl] = useState<string>('');
 
   const checkAuthentication = useCallback(() => {
     try {
@@ -171,6 +175,18 @@ export default function VideoManagementPage() {
     }, 2000);
   };
 
+  // 处理视频上传完成
+  const handleVideoUploaded = (videoData: any) => {
+    setUploadedVideoUrl(videoData.url);
+    console.log('Video uploaded:', videoData);
+  };
+
+  // 处理缩略图上传完成
+  const handleThumbnailUploaded = (thumbnailData: any) => {
+    setUploadedThumbnailUrl(thumbnailData.url);
+    console.log('Thumbnail uploaded:', thumbnailData);
+  };
+
   // 添加新视频
   const handleAddVideo = async () => {
     if (!newVideo.title || !newVideo.description || !newVideo.categoryId) {
@@ -178,23 +194,36 @@ export default function VideoManagementPage() {
       return;
     }
 
+    if (!uploadedVideoUrl) {
+      alert("请先上传视频文件");
+      return;
+    }
+
     try {
+      const videoData = {
+        ...newVideo,
+        url: uploadedVideoUrl,
+        thumbnail: uploadedThumbnailUrl || 'https://picsum.photos/800/450'
+      };
+
       const response = await fetch('/api/admin/videos', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(newVideo),
+        body: JSON.stringify(videoData),
       });
 
       if (response.ok) {
         alert("视频创建成功");
-    setNewVideo({
-      title: "",
-      description: "",
+        setNewVideo({
+          title: "",
+          description: "",
           categoryId: "",
           accessLevel: "BASIC"
         });
+        setUploadedVideoUrl('');
+        setUploadedThumbnailUrl('');
         loadData(); // 重新加载数据
       } else {
         const error = await response.json();
@@ -372,42 +401,11 @@ export default function VideoManagementPage() {
             <div className="bg-white shadow rounded-lg p-6">
               <h2 className="text-xl font-semibold mb-4">上传新视频</h2>
             
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    视频文件
-                  </label>
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="video/*"
-                    onChange={handleFileUpload}
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
-                  />
-                {uploading && (
-                    <div className="mt-2">
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                          className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${uploadProgress}%` }}
-                      ></div>
-                    </div>
-                      <p className="text-sm text-gray-600 mt-1">上传进度: {uploadProgress}%</p>
-                  </div>
-                )}
-              </div>
-
-              <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    缩略图
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
-                  />
-                </div>
-              </div>
+              {/* 文件上传组件 */}
+              <VideoUploader 
+                onVideoUploaded={handleVideoUploaded}
+                onThumbnailUploaded={handleThumbnailUploaded}
+              />
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                   <div>

@@ -10,15 +10,19 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
-    "db:reset": "tsx prisma/reset-db.ts",
-    "db:init": "curl -X POST http://localhost:3000/api/init-db"
+    "db:studio": "prisma studio",
+    "db:migrate": "prisma migrate dev",
+    "db:reset": "prisma migrate reset"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.0.1",
+    "@prisma/client": "^6.16.2",
+    "dotenv": "^17.2.2",
     "next": "15.5.0",
     "next-auth": "^4.24.11",
+    "prisma": "^6.16.2",
     "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "@prisma/client": "^5.10.0"
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -29,8 +33,6 @@
     "eslint": "^9",
     "eslint-config-next": "15.5.0",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "prisma": "^5.10.0",
-    "tsx": "^4.7.0"
+    "typescript": "^5"
   }
 }

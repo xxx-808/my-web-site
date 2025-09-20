@@ -99,20 +99,50 @@ export default function StudentLoginPage() {
     setError("");
 
     try {
-      // 模拟登录验证
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      if (email === "student@example.com" && password === "password123") {
+      // 调用真实的登录API
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          password,
+          role: 'STUDENT'
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.user) {
+        const user = data.user;
         setIsLoggedIn(true);
-        setStudent(mockStudent);
-        // 记住登录（带上账号套餐）
-        localStorage.setItem("tc_auth", JSON.stringify({ role: "STUDENT", id: mockStudent.id, plan: mockStudent.subscription }));
+        
+        // 创建学生对象
+        const studentData: Student = {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          subscription: user.subscription?.accessLevel === 'PREMIUM' ? 'pro' : 'basic',
+          expiresAt: user.subscription?.endDate ? new Date(user.subscription.endDate).toISOString().split('T')[0] : '2025-12-31',
+        };
+        
+        setStudent(studentData);
+        
+        // 记住登录状态
+        localStorage.setItem("tc_auth", JSON.stringify({ 
+          role: "STUDENT", 
+          id: user.id, 
+          plan: studentData.subscription 
+        }));
+        
         setError("");
       } else {
-        setError("邮箱或密码错误");
+        setError(data.error || "登录失败");
       }
-    } catch {
-      setError("登录失败，请重试");
+    } catch (error) {
+      console.error('登录错误:', error);
+      setError("网络错误，请检查连接");
     } finally {
       setLoading(false);
     }

@@ -1,47 +1,56 @@
-# Vercel 部署指南
+# Vercel 部署完整指南
 
-## 问题解决
+## 🚀 快速部署步骤
 
-之前的错误 "There is a problem with the server configuration" 是因为使用了本地SQLite数据库，而Vercel是无服务器环境，无法访问本地文件系统。
+### 1. 推送代码到GitHub
 
-## 解决方案
+确保您的代码已推送到GitHub仓库。
 
-### 1. 使用 Vercel Postgres
+### 2. 在Vercel中配置环境变量
 
-1. 在 Vercel Dashboard 中，进入你的项目
-2. 点击 "Storage" 标签
-3. 点击 "Create Database" 
-4. 选择 "Postgres"
-5. 创建数据库
-
-### 2. 配置环境变量
-
-在 Vercel Dashboard 的 "Settings" > "Environment Variables" 中添加：
+在 Vercel Dashboard 的 "Settings" > "Environment Variables" 中添加以下变量：
 
 ```
-DATABASE_URL=postgresql://username:password@host:port/database?sslmode=require
-NEXTAUTH_SECRET=your-secret-key-here
-NEXTAUTH_URL=https://your-app.vercel.app
+DATABASE_URL=postgresql://neondb_owner:npg_ZnLAzPvU8EM6@ep-proud-mud-a1iu2mv5-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+NEXTAUTH_SECRET=your-super-secret-key-change-this-in-production-2024
+NEXTAUTH_URL=https://your-vercel-domain.vercel.app
 ```
 
-### 3. 部署步骤
+⚠️ **重要**：请将 `https://your-vercel-domain.vercel.app` 替换为您的实际Vercel域名。
 
-1. 推送代码到 GitHub
-2. Vercel 会自动检测到 `vercel.json` 配置
-3. 构建时会自动运行 `prisma generate`
-4. 部署完成后，数据库会自动创建表结构
+### 3. 部署项目
 
-### 4. 初始化数据
+1. 在Vercel中连接您的GitHub仓库
+2. Vercel会自动检测Next.js项目并开始构建
+3. 等待部署完成
 
-部署完成后，需要手动运行种子数据：
+### 4. 初始化数据库
+
+部署完成后，访问以下URL来初始化数据库：
+
+```
+POST https://your-vercel-domain.vercel.app/api/init-database
+Content-Type: application/json
+
+{
+  "secret": "your-super-secret-key-change-this-in-production-2024"
+}
+```
+
+或者使用curl命令：
 
 ```bash
-# 在 Vercel 的 Functions 中创建一个 API 路由来初始化数据
-# 或者使用 Vercel CLI 运行
-vercel env pull .env.local
-npx prisma db push
-npx prisma db seed
+curl -X POST https://your-vercel-domain.vercel.app/api/init-database \
+  -H "Content-Type: application/json" \
+  -d '{"secret":"your-super-secret-key-change-this-in-production-2024"}'
 ```
+
+### 5. 测试登录
+
+初始化完成后，您可以使用以下测试账户：
+
+- **管理员**：admin@test.com / admin123
+- **学生**：student@test.com / student123
 
 ## 本地开发
 
