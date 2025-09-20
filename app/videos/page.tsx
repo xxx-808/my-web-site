@@ -1,62 +1,27 @@
 "use client";
 
-import { useState, useEffect, useRef, useMemo } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from "react";
 
-type Plan = "basic" | "pro";
-
-interface VideoAccess {
+interface Video {
   id: string;
   title: string;
   description: string;
+  url: string;
   thumbnail: string;
   duration: number;
   category: string;
-  accessLevel: string;
-  canAccess: boolean;
-  watchProgress: number;
-  url?: string; // 添加URL字段
-  lastWatched?: string;
 }
 
-
-
 export default function VideosPage() {
-  const [videos, setVideos] = useState<VideoAccess[]>([]);
-  const [selectedVideo, setSelectedVideo] = useState<VideoAccess | null>(null);
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [volume, setVolume] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [plan, setPlan] = useState<Plan | null>(null);
-  const [userRole, setUserRole] = useState<string | null>(null);
-  const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // 恢复登录状态（站内持久）
-  useEffect(() => {
-    try {
-      const raw = localStorage.getItem("tc_auth");
-      if (raw) {
-        const parsed = JSON.parse(raw) as { role: string; plan?: Plan };
-        setIsLoggedIn(true);
-        setUserRole(parsed.role);
-        setPlan(parsed.plan ?? "basic");
-      } else {
-        setIsLoggedIn(false);
-        setPlan(null);
-        setUserRole(null);
-      }
-    } catch {
-      setIsLoggedIn(false);
-      setPlan(null);
-      setUserRole(null);
-    }
-  }, []);
-
-  // 初始化课程 - 不需要登录，直接获取视频
+  // 加载视频
   useEffect(() => {
     fetchVideos();
   }, []);
@@ -64,62 +29,26 @@ export default function VideosPage() {
   const fetchVideos = async () => {
     try {
       setIsLoading(true);
-      
-      // 首先确保用户视频存在于数据库
-      try {
-        const ensureResponse = await fetch('/api/ensure-video');
-        const ensureData = await ensureResponse.json();
-        console.log('确保视频结果:', ensureData);
-      } catch (e) {
-        console.log('确保视频失败:', e);
-      }
-      
-      // 获取用户ID（从localStorage中的认证信息）
-      const authData = localStorage.getItem("tc_auth");
-      let userId = null;
-      if (authData) {
-        try {
-          const parsed = JSON.parse(authData);
-          userId = parsed.id;
-        } catch (e) {
-          console.log('解析认证数据失败:', e);
-        }
-      }
-      
-      console.log('获取视频，用户ID:', userId);
-      
-      // 使用简化的API，传递用户ID
-      const apiUrl = userId ? `/api/videos-simple?userId=${userId}` : '/api/videos-simple';
-      const response = await fetch(apiUrl);
+      const response = await fetch('/api/videos');
       
       if (response.ok) {
         const data = await response.json();
-        console.log('API响应:', data);
+        console.log('获取到的视频:', data);
         setVideos(data.videos || []);
-        setPlan(data.userSubscription?.planName === 'premium' ? 'pro' : 'basic');
       } else {
-        const errorText = await response.text();
-        console.error('Failed to fetch videos:', response.status, errorText);
+        console.error('获取视频失败:', response.status);
         setVideos([]);
       }
     } catch (error) {
-      console.error('Error fetching videos:', error);
+      console.error('获取视频错误:', error);
       setVideos([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const grouped = useMemo(() => {
-    const buckets: Record<VideoAccess["category"], VideoAccess[]> = {
-      writing: [], speaking: [], reading: [], listening: []
-    };
-    for (const v of videos) buckets[v.category].push(v);
-    return buckets;
-  }, [videos]);
-
-  const handleVideoSelect = (video: VideoAccess) => {
-    // 停止当前播放的视频
+  // 选择视频
+  const handleVideoSelect = (video: Video) => {
     if (videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
@@ -130,9 +59,10 @@ export default function VideosPage() {
     setCurrentTime(0);
     setDuration(0);
     
-    console.log('选择视频:', video.title, 'URL:', video.url);
+    console.log('选择视频:', video.title, video.url);
   };
 
+  // 播放/暂停
   const handlePlayPause = async () => {
     if (!selectedVideo || !videoRef.current) return;
     
@@ -146,183 +76,160 @@ export default function VideosPage() {
       }
     } catch (error) {
       console.error('播放失败:', error);
-      alert('视频播放失败，请检查网络连接或稍后重试。');
+      alert('视频播放失败，请刷新页面重试。');
     }
   };
 
-  const handleTimeUpdate = (e: React.ChangeEvent<HTMLVideoElement>) => setCurrentTime(e.target.currentTime);
-  const handleLoadedMetadata = (e: React.ChangeEvent<HTMLVideoElement>) => setDuration(e.target.duration);
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const time = parseFloat(e.target.value); if (videoRef.current) { videoRef.current.currentTime = time; setCurrentTime(time); }
+  // 时间更新
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
   };
-  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => { const v = parseFloat(e.target.value); setVolume(v); if (videoRef.current) videoRef.current.volume = v; };
-  const formatTime = (s: number) => `${Math.floor(s/60)}:${Math.floor(s%60).toString().padStart(2,'0')}`;
 
-  if (!isLoggedIn) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
-          <div className="text-6xl mb-4">🔑</div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-3">需要登录后观看</h1>
-          <p className="text-gray-600 mb-6">请先登录您的账号（普通或 Pro 套餐）。</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button onClick={() => router.push("/student-login")} className="bg-emerald-600 text-white px-6 py-2 rounded-lg hover:bg-emerald-700 transition-colors">学生登录</button>
-            <button onClick={() => router.push("/admin-login")} className="bg-gray-800 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition-colors">管理员登录</button>
-            <button onClick={() => router.push("/")} className="px-6 py-2 rounded-lg border border-gray-300 hover:bg-gray-50 transition-colors">返回首页</button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+  // 元数据加载
+  const handleLoadedMetadata = () => {
+    if (videoRef.current) {
+      setDuration(videoRef.current.duration);
+    }
+  };
+
+  // 进度条拖拽
+  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const time = parseFloat(e.target.value);
+    if (videoRef.current) {
+      videoRef.current.currentTime = time;
+      setCurrentTime(time);
+    }
+  };
+
+  // 格式化时间
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  // 按分类分组视频
+  const speakingVideos = videos.filter(v => v.category === 'speaking');
 
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">正在加载课程...</p>
+          <p className="text-gray-600">加载视频中...</p>
         </div>
       </div>
     );
   }
 
-  const sections: { key: VideoAccess["category"]; title: string; icon: string }[] = [
-    { key: "writing", title: "写作（Writing）", icon: "✍️" },
-    { key: "speaking", title: "口语（Speaking）", icon: "🗣️" },
-    { key: "reading", title: "阅读（Reading）", icon: "📖" },
-    { key: "listening", title: "听力（Listening）", icon: "👂" },
-  ];
-
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => router.push("/")}
-                className="text-gray-600 hover:text-gray-900"
+      {/* 头部 */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16">
+            <div className="flex items-center">
+              <button 
+                onClick={() => window.history.back()}
+                className="text-gray-600 hover:text-gray-900 mr-4"
               >
                 ← 返回首页
               </button>
-              <h1 className="text-2xl font-bold text-gray-900">雅思录课视频库</h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="text-sm text-gray-600">
-                当前套餐: <span className="font-medium">{plan === "pro" ? "Pro" : "Basic"}</span>
-              </div>
-              {userRole === 'ADMIN' && (
-                <button
-                  onClick={() => router.push("/admin")}
-                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm"
-                >
-                  管理面板
-                </button>
-              )}
+              <h1 className="text-xl font-semibold text-gray-900">雅思录课视频库</h1>
             </div>
           </div>
         </div>
-      </header>
+      </div>
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Video List */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          
+          {/* 视频列表 */}
           <div className="lg:col-span-2">
-            <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
+            <div className="bg-white rounded-xl shadow-sm border">
               <div className="p-6 border-b">
-                <h2 className="text-xl font-semibold text-gray-900">课程分类</h2>
-                <p className="text-gray-600 mt-1">按技能分类浏览课程内容</p>
+                <h2 className="text-lg font-medium text-gray-900">课程分类</h2>
+                <p className="text-sm text-gray-500 mt-1">按技能分类浏览课程内容</p>
               </div>
-              
+
               <div className="p-6">
-                {sections.map((section) => (
-                  <div key={section.key} className="mb-8 last:mb-0">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                      <span>{section.icon}</span>
-                      {section.title}
-                    </h3>
-                    
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {grouped[section.key].length === 0 ? (
-                        <div className="col-span-2 text-center py-8">
-                          <div className="text-gray-400">
-                            <div className="text-4xl mb-2">📹</div>
-                            <div className="text-sm">该分类暂无视频</div>
-                            <div className="text-xs text-gray-300 mt-1">管理员正在准备课程内容</div>
-                          </div>
-                        </div>
-                      ) : (
-                        grouped[section.key].map((video) => (
-                          <div
-                            key={video.id}
-                            onClick={() => handleVideoSelect(video)}
-                            className={`border rounded-lg p-4 cursor-pointer transition-all hover:shadow-md ${
-                              selectedVideo?.id === video.id
-                                ? 'border-blue-500 bg-blue-50'
-                                : 'border-gray-200 hover:border-gray-300'
-                            } ${!video.canAccess ? 'opacity-60' : ''}`}
-                          >
-                            <div className="flex gap-3">
-                              <img
-                                src={video.thumbnail}
-                                alt={video.title}
-                                className="w-20 h-12 object-cover rounded"
-                              />
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-start justify-between">
-                                  <h4 className="text-sm font-medium text-gray-900 truncate">
-                                    {video.title}
-                                  </h4>
-                                  <span className={`ml-2 px-2 py-1 text-xs font-semibold rounded-full ${
-                                    video.accessLevel === "pro"
-                                      ? "bg-purple-100 text-purple-800"
-                                      : "bg-green-100 text-green-800"
-                                  }`}>
-                                    {video.accessLevel === "pro" ? "Pro" : "Basic"}
-                                  </span>
-                                </div>
-                                <p className="text-xs text-gray-500 mt-1 line-clamp-2">
-                                  {video.description}
-                                </p>
-                                <div className="flex items-center justify-between mt-2">
-                                  <span className="text-xs text-gray-400">{video.duration}</span>
-                                  {video.watchProgress > 0 && (
-                                    <div className="flex items-center gap-1">
-                                      <div className="w-16 bg-gray-200 rounded-full h-1">
-                                        <div
-                                          className="bg-blue-600 h-1 rounded-full"
-                                          style={{ width: `${video.watchProgress}%` }}
-                                        ></div>
-                                      </div>
-                                      <span className="text-xs text-gray-500">{video.watchProgress}%</span>
-                      </div>
-                                  )}
-                    </div>
-                                {!video.canAccess && (
-                                  <div className="mt-2">
-                                    <span className="text-xs text-red-600 font-medium">
-                                      {video.accessLevel === "pro" ? "需要 Pro 套餐" : "无访问权限"}
-                                    </span>
-                      </div>
-                                )}
-                      </div>
+                {/* 口语分类 */}
+                <div className="mb-8">
+                  <div className="flex items-center mb-4">
+                    <span className="text-lg mr-2">🗣️</span>
+                    <h3 className="text-lg font-medium text-gray-900">口语 (Speaking)</h3>
+                  </div>
+                  
+                  {speakingVideos.length > 0 ? (
+                    <div className="space-y-3">
+                      {speakingVideos.map((video) => (
+                        <div
+                          key={video.id}
+                          onClick={() => handleVideoSelect(video)}
+                          className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                            selectedVideo?.id === video.id 
+                              ? 'border-blue-500 bg-blue-50' 
+                              : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                        >
+                          <div className="flex items-start space-x-4">
+                            <img
+                              src={video.thumbnail}
+                              alt={video.title}
+                              className="w-20 h-12 object-cover rounded"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.src = 'https://picsum.photos/160/90?random=speaking';
+                              }}
+                            />
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-medium text-gray-900 truncate">{video.title}</h4>
+                              <p className="text-sm text-gray-600 mt-1 line-clamp-2">{video.description}</p>
+                              <div className="flex items-center justify-between mt-2">
+                                <span className="text-xs text-gray-500">{Math.floor(video.duration / 60)}分钟</span>
+                                <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Basic</span>
+                              </div>
                             </div>
                           </div>
-                        ))
-                      )}
+                        </div>
+                      ))}
                     </div>
-                  </div>
-                ))}
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <div className="text-4xl mb-2">📹</div>
+                      <p>该分类暂无视频</p>
+                      <p className="text-sm">敬请期待更多精彩内容</p>
+                    </div>
+                  )}
+                </div>
+
+                {/* 其他分类 - 暂无视频 */}
+                {['写作 (Writing)', '阅读 (Reading)', '听力 (Listening)'].map((categoryName, index) => {
+                  const icons = ['✍️', '📖', '👂'];
+                  return (
+                    <div key={categoryName} className="mb-8">
+                      <div className="flex items-center mb-4">
+                        <span className="text-lg mr-2">{icons[index]}</span>
+                        <h3 className="text-lg font-medium text-gray-900">{categoryName}</h3>
+                      </div>
+                      <div className="text-center py-8 text-gray-500">
+                        <div className="text-4xl mb-2">📹</div>
+                        <p>该分类暂无视频</p>
+                        <p className="text-sm">敬请期待更多精彩内容</p>
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
 
-          {/* Video Player */}
+          {/* 视频播放器 */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-sm border overflow-hidden sticky top-8">
-            {selectedVideo ? (
+              {selectedVideo ? (
                 <>
                   <div className="aspect-video bg-black relative">
                     <video
@@ -338,21 +245,14 @@ export default function VideosPage() {
                       crossOrigin="anonymous"
                       onError={(e) => {
                         console.error('视频加载错误:', e);
-                        console.error('视频URL:', selectedVideo.url);
                         setIsPlaying(false);
                       }}
-                      onLoadStart={() => {
-                        console.log('开始加载视频:', selectedVideo.url);
-                      }}
-                      onCanPlay={() => {
-                        console.log('视频可以播放');
-                      }}
                     >
-                    <source src={selectedVideo.url || `/api/video/${selectedVideo.id}`} type="video/mp4" />
-                    您的浏览器不支持视频播放。
-                  </video>
+                      <source src={selectedVideo.url} type="video/mp4" />
+                      您的浏览器不支持视频播放。
+                    </video>
                     
-                    {/* Play Button Overlay */}
+                    {/* 播放按钮覆盖层 */}
                     {!isPlaying && (
                       <button
                         onClick={handlePlayPause}
@@ -366,80 +266,46 @@ export default function VideosPage() {
                   </div>
 
                   <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                      {selectedVideo.title}
-                    </h3>
-                    <p className="text-sm text-gray-600 mb-4">
-                      {selectedVideo.description}
-                    </p>
-
-                    {/* Progress Bar */}
-                    <div className="mb-4">
-                      <div className="flex justify-between text-xs text-gray-500 mb-1">
+                    <h3 className="font-medium text-gray-900 mb-2">{selectedVideo.title}</h3>
+                    <p className="text-sm text-gray-600 mb-4">{selectedVideo.description}</p>
+                    
+                    {/* 播放控制 */}
+                    <div className="space-y-3">
+                      {/* 进度条 */}
+                      <div className="flex items-center space-x-2 text-sm text-gray-500">
                         <span>{formatTime(currentTime)}</span>
-                        <span>{formatTime(duration)}</span>
-                      </div>
-                      <input
-                        type="range"
-                        min="0"
-                        max={duration || 0}
-                        value={currentTime}
-                        onChange={handleSeek}
-                        className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-                      />
-                    </div>
-
-                    {/* Controls */}
-                    <div className="flex items-center justify-between">
-                      <button
-                        onClick={handlePlayPause}
-                        className="flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900"
-                      >
-                        {isPlaying ? (
-                          <>
-                            <span className="text-xl">⏸️</span>
-                            暂停
-                          </>
-                        ) : (
-                          <>
-                            <span className="text-xl">▶️</span>
-                            播放
-                          </>
-                        )}
-                      </button>
-
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">音量</span>
                         <input
                           type="range"
                           min="0"
-                          max="1"
-                          step="0.1"
-                          value={volume}
-                          onChange={handleVolumeChange}
-                          className="w-16 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
+                          max={duration || 0}
+                          value={currentTime}
+                          onChange={handleSeek}
+                          className="flex-1 h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                         />
+                        <span>{formatTime(duration)}</span>
+                      </div>
+                      
+                      {/* 播放按钮 */}
+                      <div className="flex items-center justify-center">
+                        <button
+                          onClick={handlePlayPause}
+                          className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                          <span>{isPlaying ? '⏸️' : '▶️'}</span>
+                          <span>{isPlaying ? '暂停' : '播放'}</span>
+                        </button>
+                      </div>
+                      
+                      {/* 视频信息 */}
+                      <div className="flex items-center justify-between text-sm text-gray-500 pt-2 border-t">
+                        <span>分类: speaking</span>
+                        <span>时长: {Math.floor(selectedVideo.duration / 60)}分钟</span>
+                      </div>
+                      <div className="text-center">
+                        <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Basic</span>
                       </div>
                     </div>
-
-                    {/* Video Info */}
-                    <div className="mt-4 pt-4 border-t border-gray-200">
-                      <div className="flex items-center justify-between text-xs text-gray-500 mb-2">
-                        <span>分类: {selectedVideo.category}</span>
-                        <span>时长: {selectedVideo.duration}</span>
-                    </div>
-                      <div className="flex items-center justify-between text-xs text-gray-500">
-        
-                        <span className={`px-2 py-1 rounded-full ${
-                          selectedVideo.accessLevel === "pro"
-                            ? "bg-purple-100 text-purple-800"
-                            : "bg-green-100 text-green-800"
-                        }`}>
-                          {selectedVideo.accessLevel === "pro" ? "Pro" : "Basic"}
-                        </span>
                   </div>
-                </div>
-              </div>
                 </>
               ) : (
                 <div className="aspect-video bg-gray-100 flex items-center justify-center">
@@ -448,30 +314,11 @@ export default function VideosPage() {
                     <p>选择一个视频开始观看</p>
                   </div>
                 </div>
-            )}
+              )}
+            </div>
           </div>
-      </div>
         </div>
-      </main>
-
-      <style jsx>{`
-        .slider::-webkit-slider-thumb {
-          appearance: none;
-          height: 12px;
-          width: 12px;
-          border-radius: 50%;
-          background: #3b82f6;
-          cursor: pointer;
-        }
-        .slider::-moz-range-thumb {
-          height: 12px;
-          width: 12px;
-          border-radius: 50%;
-          background: #3b82f6;
-          cursor: pointer;
-          border: none;
-        }
-      `}</style>
+      </div>
     </div>
   );
 }
