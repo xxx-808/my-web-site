@@ -62,17 +62,22 @@ export async function POST(request: NextRequest) {
       )
     `
 
-    // 创建视频分类（如果不存在）
-    console.log('📂 创建视频分类...')
-    const categories = ['雅思听力', '雅思阅读', '雅思写作', '雅思口语']
+    // 创建听说读写视频分类
+    console.log('📂 创建听说读写分类...')
+    const categories = [
+      { name: '雅思听力', description: '雅思听力技巧与练习，包括数字、时间、地点等关键信息捕获' },
+      { name: '雅思口语', description: '雅思口语表达与练习，涵盖Part 1-3各部分应对策略' },
+      { name: '雅思阅读', description: '雅思阅读理解与技巧，快速定位和理解文章核心信息' },
+      { name: '雅思写作', description: '雅思写作技巧与范文，Task 1图表描述和Task 2议论文写作' }
+    ]
     
-    for (const categoryName of categories) {
+    for (const category of categories) {
       await sql`
         INSERT INTO video_categories (id, name, description, created_at, updated_at)
         VALUES (
           'cat_' || substr(md5(random()::text), 1, 8),
-          ${categoryName},
-          ${categoryName + '相关课程'},
+          ${category.name},
+          ${category.description},
           NOW(),
           NOW()
         )

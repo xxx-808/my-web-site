@@ -71,6 +71,14 @@ export async function GET(request: NextRequest) {
       }
     });
 
+    // 分类映射配置
+    const categoryMapping: Record<string, string> = {
+      '雅思听力': 'listening',
+      '雅思口语': 'speaking', 
+      '雅思阅读': 'reading',
+      '雅思写作': 'writing'
+    };
+
     // 处理视频数据，添加访问权限信息
     const processedVideos = videos.map(video => {
       const hasDirectAccess = video.videoAccesses.length > 0;
@@ -79,17 +87,21 @@ export async function GET(request: NextRequest) {
          (video.accessLevel === 'PREMIUM' && userSubscription.plan.name === 'premium'));
       
       const canAccess = hasDirectAccess || hasSubscriptionAccess;
-             const watchProgress = video.watchHistories[0]?.progress || 0;
-       const lastWatched = video.watchHistories[0]?.watchedAt;
+      const watchProgress = video.watchHistories[0]?.progress || 0;
+      const lastWatched = video.watchHistories[0]?.watchedAt;
+      
+      // 映射分类名称到代码
+      const categoryCode = categoryMapping[video.category.name] || 'other';
 
       return {
         id: video.id,
         title: video.title,
         description: video.description,
-        category: video.category.name,
+        category: categoryCode, // 使用映射后的分类代码
+        categoryName: video.category.name, // 保留原始分类名称
         duration: video.duration,
         thumbnail: video.thumbnail,
-        accessLevel: video.accessLevel,
+        accessLevel: video.accessLevel.toLowerCase(), // 转换为小写以匹配前端
         canAccess,
         watchProgress,
         lastWatched: lastWatched,
