@@ -1,6 +1,5 @@
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegStatic from 'ffmpeg-static';
-import path from 'path';
 import { promises as fs } from 'fs';
 
 // 设置 FFmpeg 路径

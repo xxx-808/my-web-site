@@ -58,8 +58,8 @@ export default function VideoManagementPage() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activeTab, setActiveTab] = useState<'upload' | 'manage' | 'batch' | 'access'>('upload');
-  const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  // const [uploading, setUploading] = useState(false);
+  // const [uploadProgress, setUploadProgress] = useState(0);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   
   // 数据状态
@@ -145,44 +145,21 @@ export default function VideoManagementPage() {
     }
   };
 
-  // 文件上传处理
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
-
-    setUploading(true);
-    setUploadProgress(0);
-
-    // 模拟上传进度
-    const interval = setInterval(() => {
-      setUploadProgress(prev => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          return 100;
-        }
-        return prev + 10;
-      });
-    }, 200);
-
-    // 模拟上传完成
-    setTimeout(() => {
-      setUploading(false);
-      setUploadProgress(0);
-      alert("视频上传成功！");
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    }, 2000);
-  };
+  // 文件上传处理 (暂未使用)
+  // const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const files = event.target.files;
+  //   if (!files || files.length === 0) return;
+  //   // 模拟上传逻辑已移除
+  // };
 
   // 处理视频上传完成
-  const handleVideoUploaded = (videoData: any) => {
+  const handleVideoUploaded = (videoData: { url: string; filename: string }) => {
     setUploadedVideoUrl(videoData.url);
     console.log('Video uploaded:', videoData);
   };
 
   // 处理缩略图上传完成
-  const handleThumbnailUploaded = (thumbnailData: any) => {
+  const handleThumbnailUploaded = (thumbnailData: { url: string; filename: string }) => {
     setUploadedThumbnailUrl(thumbnailData.url);
     console.log('Thumbnail uploaded:', thumbnailData);
   };

@@ -34,9 +34,12 @@ export default function VideoUploader({ onVideoUploaded, onThumbnailUploaded }: 
     thumbnail: 0
   });
   
-  const [uploadedFiles, setUploadedFiles] = useState({
-    video: null as any,
-    thumbnail: null as any
+  const [uploadedFiles, setUploadedFiles] = useState<{
+    video: File | null;
+    thumbnail: File | null;
+  }>({
+    video: null,
+    thumbnail: null
   });
 
   const handleVideoUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
