@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 interface Video {
   id: string;
@@ -13,6 +14,7 @@ interface Video {
 }
 
 export default function VideosPage() {
+  const router = useRouter();
   const [videos, setVideos] = useState<Video[]>([]);
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -60,6 +62,11 @@ export default function VideosPage() {
     setDuration(0);
     
     console.log('选择视频:', video.title, video.url);
+  };
+
+  // 全屏播放
+  const handleFullscreenPlay = (video: Video) => {
+    router.push(`/videos/player/${video.id}`);
   };
 
   // 播放/暂停
@@ -167,29 +174,59 @@ export default function VideosPage() {
                       {speakingVideos.map((video) => (
                         <div
                           key={video.id}
-                          onClick={() => handleVideoSelect(video)}
-                          className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
+                          className={`p-4 border rounded-lg transition-all hover:shadow-md ${
                             selectedVideo?.id === video.id 
                               ? 'border-blue-500 bg-blue-50' 
                               : 'border-gray-200 hover:border-gray-300'
                           }`}
                         >
                           <div className="flex items-start space-x-4">
-                            <img
-                              src={video.thumbnail}
-                              alt={video.title}
-                              className="w-20 h-12 object-cover rounded"
-                              onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.src = 'https://picsum.photos/160/90?random=speaking';
-                              }}
-                            />
+                            <div className="relative">
+                              <img
+                                src={video.thumbnail}
+                                alt={video.title}
+                                className="w-20 h-12 object-cover rounded cursor-pointer"
+                                onClick={() => handleVideoSelect(video)}
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.src = 'https://picsum.photos/160/90?random=speaking';
+                                }}
+                              />
+                              {/* 全屏播放按钮 */}
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleFullscreenPlay(video);
+                                }}
+                                className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 hover:bg-opacity-70 rounded transition-all opacity-0 hover:opacity-100"
+                              >
+                                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                                </svg>
+                              </button>
+                            </div>
                             <div className="flex-1 min-w-0">
-                              <h4 className="font-medium text-gray-900 truncate">{video.title}</h4>
+                              <h4 
+                                className="font-medium text-gray-900 truncate cursor-pointer hover:text-blue-600"
+                                onClick={() => handleVideoSelect(video)}
+                              >
+                                {video.title}
+                              </h4>
                               <p className="text-sm text-gray-600 mt-1 line-clamp-2">{video.description}</p>
                               <div className="flex items-center justify-between mt-2">
                                 <span className="text-xs text-gray-500">{Math.floor(video.duration / 60)}分钟</span>
-                                <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Basic</span>
+                                <div className="flex items-center space-x-2">
+                                  <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded">Basic</span>
+                                  <button
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                      handleFullscreenPlay(video);
+                                    }}
+                                    className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition-colors"
+                                  >
+                                    全屏播放
+                                  </button>
+                                </div>
                               </div>
                             </div>
                           </div>
@@ -286,13 +323,22 @@ export default function VideosPage() {
                       </div>
                       
                       {/* 播放按钮 */}
-                      <div className="flex items-center justify-center">
+                      <div className="flex items-center justify-center space-x-3">
                         <button
                           onClick={handlePlayPause}
                           className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                         >
                           <span>{isPlaying ? '⏸️' : '▶️'}</span>
                           <span>{isPlaying ? '暂停' : '播放'}</span>
+                        </button>
+                        <button
+                          onClick={() => handleFullscreenPlay(selectedVideo)}
+                          className="flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                          </svg>
+                          <span>全屏</span>
                         </button>
                       </div>
                       
