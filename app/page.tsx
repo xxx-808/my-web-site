@@ -203,7 +203,6 @@ export default function Home() {
                 </span>
               )}
               <input placeholder="Search" className="hidden md:block bg-white/10 placeholder-gray-300 focus:bg-white/20 transition-colors rounded px-3 py-1 text-sm outline-none" />
-              <span className="text-gray-300">🔍</span>
               <div className="flex items-center gap-2">
                 {!authRole && (
                   <>
@@ -321,26 +320,31 @@ export default function Home() {
       </section>
 
       {/* IELTS Video Learning Section */}
-      <section className="border-y text-black bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-20">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-6xl font-extrabold mb-6 text-black">
-              🎯 雅思视频教学中心
+      <section className="border-y text-black bg-gradient-to-br from-gray-50 to-white">
+        <div className="mx-auto max-w-7xl px-4 py-24">
+          <div className="text-center mb-20">
+            <div className="inline-block mb-6">
+              <div className="w-20 h-1 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-full mx-auto"></div>
+            </div>
+            <h2 className="text-4xl md:text-6xl font-extrabold mb-8 text-black leading-tight">
+              雅思视频教学中心
             </h2>
-            <p className="text-xl text-black max-w-4xl mx-auto leading-relaxed">
+            <p className="text-xl text-gray-700 max-w-4xl mx-auto leading-relaxed mb-6">
               基于认知语言科学的雅思备考体系，独创&ldquo;认知诊断-策略指导-能力迁移&rdquo;三维培养模型
             </p>
-            <p className="text-lg text-black mt-4 max-w-3xl mx-auto">
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
               专为中国学生设计，解决母语负迁移带来的深层认知障碍，培养英语思维能力
             </p>
           </div>
           
           {/* Four Skills Grid */}
-          <div className="grid lg:grid-cols-2 gap-8 mb-16">
+          <div className="grid lg:grid-cols-2 gap-10 mb-20">
             {/* Writing Skills */}
-            <div className="bg-white rounded-2xl p-8 border hover:bg-gray-50 transition-all duration-300 group">
+            <div className="bg-white rounded-2xl p-8 border shadow-sm hover:shadow-lg hover:bg-gray-50 transition-all duration-300 group">
               <div className="flex items-start gap-6">
-                <div className="text-6xl group-hover:scale-110 transition-transform duration-300"></div>
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-2xl font-bold text-white">W</span>
+                </div>
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold mb-3 text-black">写作技能训练</h3>
                   <div className="space-y-3 text-black">
@@ -366,9 +370,11 @@ export default function Home() {
             </div>
 
             {/* Speaking Skills */}
-            <div className="bg-white rounded-2xl p-8 border hover:bg-gray-50 transition-all duration-300 group">
+            <div className="bg-white rounded-2xl p-8 border shadow-sm hover:shadow-lg hover:bg-gray-50 transition-all duration-300 group">
               <div className="flex items-start gap-6">
-                <div className="text-6xl group-hover:scale-110 transition-transform duration-300">🗣️</div>
+                <div className="w-16 h-16 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-2xl font-bold text-white">S</span>
+                </div>
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold mb-3 text-black">口语表达提升</h3>
                   <div className="space-y-3 text-black">
@@ -394,9 +400,11 @@ export default function Home() {
             </div>
 
             {/* Reading Skills */}
-            <div className="bg-white rounded-2xl p-8 border hover:bg-gray-50 transition-all duration-300 group">
+            <div className="bg-white rounded-2xl p-8 border shadow-sm hover:shadow-lg hover:bg-gray-50 transition-all duration-300 group">
               <div className="flex items-start gap-6">
-                <div className="text-6xl group-hover:scale-110 transition-transform duration-300"></div>
+                <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-2xl font-bold text-white">R</span>
+                </div>
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold mb-3 text-black">阅读策略掌握</h3>
                   <div className="space-y-3 text-black">
@@ -422,9 +430,11 @@ export default function Home() {
         </div>
 
             {/* Listening Skills */}
-            <div className="bg-white rounded-2xl p-8 border hover:bg-gray-50 transition-all duration-300 group">
+            <div className="bg-white rounded-2xl p-8 border shadow-sm hover:shadow-lg hover:bg-gray-50 transition-all duration-300 group">
               <div className="flex items-start gap-6">
-                <div className="text-6xl group-hover:scale-110 transition-transform duration-300">👂</div>
+                <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                  <span className="text-2xl font-bold text-white">L</span>
+                </div>
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold mb-3 text-black">听力技巧培养</h3>
                   <div className="space-y-3 text-black">
@@ -452,48 +462,57 @@ export default function Home() {
 
           {/* Features & CTA */}
           <div className="text-center text-black">
-            <div className="grid md:grid-cols-3 gap-6 mb-8">
-              <div className="bg-white rounded-xl p-6 border">
-                <div className="text-3xl mb-3"></div>
-                <h4 className="text-lg font-semibold mb-2 text-black">认知科学设计</h4>
-                <p className="text-sm text-black">基于认知语言科学的课程设计，解决深层学习障碍</p>
+            <div className="grid md:grid-cols-3 gap-8 mb-12">
+              <div className="bg-white rounded-xl p-8 border shadow-sm hover:shadow-lg transition-all duration-300">
+                <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-xl flex items-center justify-center mb-6 mx-auto">
+                  <span className="text-2xl font-bold text-white">C</span>
+                </div>
+                <h4 className="text-xl font-semibold mb-3 text-black">认知科学设计</h4>
+                <p className="text-gray-600 leading-relaxed">基于认知语言科学的课程设计，解决深层学习障碍</p>
               </div>
-              <div className="bg-white rounded-xl p-6 border">
-                <div className="text-3xl mb-3">🎯</div>
-                <h4 className="text-lg font-semibold mb-2 text-black">个性化学习路径</h4>
-                <p className="text-sm text-black">VARK学习风格分析，定制专属学习策略</p>
+              <div className="bg-white rounded-xl p-8 border shadow-sm hover:shadow-lg transition-all duration-300">
+                <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex items-center justify-center mb-6 mx-auto">
+                  <span className="text-2xl font-bold text-white">P</span>
+                </div>
+                <h4 className="text-xl font-semibold mb-3 text-black">个性化学习路径</h4>
+                <p className="text-gray-600 leading-relaxed">VARK学习风格分析，定制专属学习策略</p>
               </div>
-              <div className="bg-white rounded-xl p-6 border">
-                <div className="text-3xl mb-3">🔒</div>
-                <h4 className="text-lg font-semibold mb-2 text-black">企业级安全保护</h4>
-                <p className="text-sm text-black">IP绑定、防录屏、权限管理，保护知识产权</p>
+              <div className="bg-white rounded-xl p-8 border shadow-sm hover:shadow-lg transition-all duration-300">
+                <div className="w-14 h-14 bg-gradient-to-br from-gray-600 to-gray-800 rounded-xl flex items-center justify-center mb-6 mx-auto">
+                  <span className="text-2xl font-bold text-white">S</span>
+                </div>
+                <h4 className="text-xl font-semibold mb-3 text-black">企业级安全保护</h4>
+                <p className="text-gray-600 leading-relaxed">IP绑定、防录屏、权限管理，保护知识产权</p>
               </div>
             </div>
             
             <a
               href="/videos"
-              className="inline-flex items-center gap-4 bg-gray-100 text-black px-12 py-6 rounded-2xl text-2xl font-bold hover:bg-gray-200 transition-all duration-300 shadow-2xl"
+              className="inline-flex items-center gap-4 bg-gradient-to-r from-emerald-600 to-teal-700 text-white px-12 py-6 rounded-2xl text-2xl font-bold hover:from-emerald-700 hover:to-teal-800 transition-all duration-300 shadow-2xl hover:shadow-3xl transform hover:scale-105"
             >
-              🚀 进入雅思视频教学中心
+              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                <span className="text-lg">▶</span>
+              </div>
+              进入雅思视频教学中心
               <span className="text-3xl">→</span>
             </a>
             
-            <div className="mt-8 flex items-center justify-center gap-8 text-black">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-emerald-600 rounded-full"></span>
-                <span>IP地址绑定</span>
+            <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-gray-600">
+              <div className="flex items-center gap-3 bg-gray-100 px-4 py-2 rounded-full">
+                <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
+                <span className="text-sm font-medium">IP地址绑定</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-emerald-600 rounded-full"></span>
-                <span>防录屏下载</span>
+              <div className="flex items-center gap-3 bg-gray-100 px-4 py-2 rounded-full">
+                <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
+                <span className="text-sm font-medium">防录屏下载</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-emerald-600 rounded-full"></span>
-                <span>权限到期管理</span>
+              <div className="flex items-center gap-3 bg-gray-100 px-4 py-2 rounded-full">
+                <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
+                <span className="text-sm font-medium">权限到期管理</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 bg-emerald-600 rounded-full"></span>
-                <span>认知进度追踪</span>
+              <div className="flex items-center gap-3 bg-gray-100 px-4 py-2 rounded-full">
+                <span className="w-2 h-2 bg-emerald-600 rounded-full"></span>
+                <span className="text-sm font-medium">认知进度追踪</span>
               </div>
             </div>
           </div>

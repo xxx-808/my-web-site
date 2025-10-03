@@ -236,16 +236,6 @@ export default function StudentLoginPage() {
           </div>
         </form>
 
-        {/* Demo Account Info - 只在登录模式显示 */}
-        {!isRegisterMode && (
-          <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-            <h4 className="text-sm font-medium text-blue-900 mb-2">演示账号</h4>
-            <p className="text-xs text-blue-700">
-              邮箱: student@example.com<br />
-              密码: password123
-            </p>
-          </div>
-        )}
       </div>
     </div>
   );
