@@ -21,12 +21,42 @@ export default function VideosPage() {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  // 加载视频
+  // 检查登录状态
   useEffect(() => {
-    fetchVideos();
+    checkAuthStatus();
   }, []);
+
+  // 加载视频（只有登录用户才能加载）
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchVideos();
+    }
+  }, [isLoggedIn]);
+
+  const checkAuthStatus = () => {
+    try {
+      const authData = localStorage.getItem("tc_auth");
+      if (authData) {
+        const parsed = JSON.parse(authData);
+        if (parsed.role === "STUDENT" || parsed.role === "ADMIN") {
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
+    } catch (error) {
+      console.error('检查登录状态失败:', error);
+      setIsLoggedIn(false);
+    } finally {
+      setIsCheckingAuth(false);
+    }
+  };
 
   const fetchVideos = async () => {
     try {
@@ -120,6 +150,50 @@ export default function VideosPage() {
   // 按分类分组视频
   const speakingVideos = videos.filter(v => v.category === 'speaking');
 
+  // 检查登录状态中
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">检查登录状态中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 未登录用户
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md w-full text-center">
+          <div className="bg-white rounded-xl shadow-lg p-8">
+            <div className="text-6xl mb-4">🔒</div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-4">需要登录才能访问</h1>
+            <p className="text-gray-600 mb-6">
+              请先登录您的账号才能观看视频课程
+            </p>
+            <div className="space-y-3">
+              <button
+                onClick={() => router.push('/student-login')}
+                className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-4 rounded-lg font-medium transition-colors"
+              >
+                前往登录
+              </button>
+              <button
+                onClick={() => router.push('/')}
+                className="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 px-4 rounded-lg font-medium transition-colors"
+              >
+                返回首页
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 加载视频中
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">

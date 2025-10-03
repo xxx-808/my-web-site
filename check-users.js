@@ -13,7 +13,7 @@ async function checkUsers() {
         email, 
         name, 
         role, 
-        created_at, 
+        created_at,
         updated_at
       FROM users 
       ORDER BY created_at DESC
@@ -37,58 +37,44 @@ async function checkUsers() {
       console.log('   ' + '-'.repeat(50));
     });
     
-    // 查询用户订阅信息
-    console.log('\n🔍 查询用户订阅信息...\n');
+    // 统计角色分布
+    const roleStats = users.reduce((acc, user) => {
+      acc[user.role] = (acc[user.role] || 0) + 1;
+      return acc;
+    }, {});
     
+    console.log('\n📈 角色统计:');
+    Object.entries(roleStats).forEach(([role, count]) => {
+      console.log(`   ${role}: ${count} 人`);
+    });
+    
+    // 查询用户订阅信息
+    console.log('\n💳 用户订阅信息:');
     const subscriptions = await sql`
       SELECT 
-        s.id,
-        s.user_id,
-        s.status,
-        s.start_date,
-        s.end_date,
         u.email,
         u.name,
+        s.status as subscription_status,
         p.name as plan_name,
-        p.description as plan_description
-      FROM subscriptions s
-      JOIN users u ON s.user_id = u.id
-      JOIN subscription_plans p ON s.plan_id = p.id
-      ORDER BY s.created_at DESC
+        s.start_date,
+        s.end_date
+      FROM users u
+      LEFT JOIN subscriptions s ON u.id = s.user_id
+      LEFT JOIN subscription_plans p ON s.plan_id = p.id
+      ORDER BY u.created_at DESC
     `;
     
-    console.log(`📊 找到 ${subscriptions.length} 个订阅:\n`);
-    
-    if (subscriptions.length > 0) {
-      subscriptions.forEach((sub, index) => {
-        console.log(`${index + 1}. 订阅信息:`);
-        console.log(`   订阅ID: ${sub.id}`);
-        console.log(`   用户: ${sub.email} (${sub.name || '未设置'})`);
-        console.log(`   计划: ${sub.plan_name}`);
-        console.log(`   状态: ${sub.status}`);
+    subscriptions.forEach((sub, index) => {
+      console.log(`${index + 1}. ${sub.email} (${sub.name || '未设置'})`);
+      if (sub.subscription_status) {
+        console.log(`   订阅状态: ${sub.subscription_status}`);
+        console.log(`   订阅计划: ${sub.plan_name}`);
         console.log(`   开始时间: ${sub.start_date}`);
         console.log(`   结束时间: ${sub.end_date}`);
-        console.log(`   计划描述: ${sub.plan_description}`);
-        console.log('   ' + '-'.repeat(50));
-      });
-    } else {
-      console.log('❌ 没有找到订阅信息');
-    }
-    
-    // 查询用户角色统计
-    console.log('\n📈 用户角色统计:\n');
-    
-    const roleStats = await sql`
-      SELECT 
-        role,
-        COUNT(*) as count
-      FROM users 
-      GROUP BY role
-      ORDER BY count DESC
-    `;
-    
-    roleStats.forEach(stat => {
-      console.log(`   ${stat.role}: ${stat.count} 人`);
+      } else {
+        console.log(`   订阅状态: 无订阅`);
+      }
+      console.log('   ' + '-'.repeat(40));
     });
     
   } catch (error) {
