@@ -205,20 +205,12 @@ export default function Home() {
               <input placeholder="Search" className="hidden md:block bg-white/10 placeholder-gray-300 focus:bg-white/20 transition-colors rounded px-3 py-1 text-sm outline-none" />
               <div className="flex items-center gap-2">
                 {!authRole && (
-                  <>
-                    <button 
-                      onClick={() => router.push("/student-login")}
-                      className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                    >
-                      学生登录
-                    </button>
-                    <button 
-                      onClick={() => router.push("/admin-login")}
-                      className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
-                    >
-                      管理员登录
-                    </button>
-                  </>
+                  <button 
+                    onClick={() => router.push("/login")}
+                    className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-md text-sm font-medium transition-colors"
+                  >
+                    登录
+                  </button>
                 )}
                 {authRole && (
                   <button

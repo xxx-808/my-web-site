@@ -199,7 +199,7 @@ export default function VideoPlayerPage() {
             </p>
             <div className="space-y-3">
               <button
-                onClick={() => router.push('/student-login')}
+                onClick={() => router.push('/login')}
                 className="w-full bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-4 rounded-lg font-medium transition-colors"
               >
                 前往登录

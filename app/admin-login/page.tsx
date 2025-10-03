@@ -215,13 +215,6 @@ export default function AdminLoginPage() {
           </div>
         </form>
 
-        <div className="bg-purple-50 border border-purple-200 rounded-md p-4">
-          <h4 className="text-sm font-medium text-purple-900 mb-2">演示账号</h4>
-          <p className="text-xs text-purple-700">
-            邮箱: admin@tiffanyscollege.com<br />
-            密码: admin123
-          </p>
-        </div>
       </div>
     </div>
   );
